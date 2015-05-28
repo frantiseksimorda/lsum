@@ -1,10 +1,11 @@
+#coding: utf8
 from django.db import models
 from datetime import datetime
 from django.contrib import admin
 
 
 POHLAVI_MOZNOSTI = (
-('M', 'Mu?'),
+('M', 'Muž'),
 ('Z', 'Zena.'),
 )
 
