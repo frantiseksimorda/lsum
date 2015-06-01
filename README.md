@@ -18,3 +18,5 @@ Ukoly:
 3) sync useru a cipu do dalsich systemu - SafeQ, Bakalari?, Vstupni jednotky
 
 4) moznost mazani/blokovani starych useru
+
+5) az bude ostra verze, pridam config Apache/Nginxu a provoz bude nejlepsi ve virtualnim prostredi virtualenv
