@@ -1,22 +1,11 @@
 # lsum
 Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
 
-Zavislosti: git, python2, python2-django
+# Installation
+- Install `git` package
+- Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`)
+- Install `python2` and `python2-django` packages
+- Execute `python2 manage.py runserver`
+- Open your browser at `http://localhost:8000/admin`
 
-git clone https://github.com/frantiseksimorda/lsum.git
 
-python2 manage.py runserver
-
-A pak uz jak radi Python - http://localhost:8000/admin
-
-Ukoly:
-
-1) sync useru z Bakalaru (MSSQL)
-
-2) tvorba username a vytvareni Unix/Samba loginu s homedirem
-
-3) sync useru a cipu do dalsich systemu - SafeQ, Bakalari?, Vstupni jednotky
-
-4) moznost mazani/blokovani starych useru
-
-5) az bude ostra verze, pridam config Apache/Nginxu a provoz bude nejlepsi ve virtualnim prostredi virtualenv
