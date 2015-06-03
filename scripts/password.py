@@ -21,8 +21,12 @@ class Password:
 
     def __init__(self):
 
-        f = open(dirname(__file__) + '/../passwords.pwd')
         self.pwds = {}
+
+        try:
+            f = open(dirname(__file__) + '/../passwordskj.pwd')
+        except IOError:
+            raise Exception("File 'passwords.pwd' not found")
 
         for line in f:
             try:
@@ -31,7 +35,7 @@ class Password:
                 x = line.split("#")
                 self.pwds[x[1].rstrip()] = x[0].rstrip()
             except:
-                raise Exception("The file 'passwords.pwd' is corrupted")
+                raise Exception("File 'passwords.pwd' is corrupted")
 
     def read(self, pwd):
 
