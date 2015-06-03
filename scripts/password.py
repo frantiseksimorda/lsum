@@ -24,7 +24,7 @@ class Password:
         self.pwds = {}
 
         try:
-            f = open(dirname(__file__) + '/../passwordskj.pwd')
+            f = open(dirname(__file__) + '/../passwords.pwd')
         except IOError:
             raise Exception("File 'passwords.pwd' not found")
 
