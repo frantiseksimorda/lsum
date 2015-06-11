@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """lsum URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -18,5 +19,10 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^importcsv/$', 'evid.views.importcsv', name='importcsv' ),
+    url(r'^importcsv/', 'evid.views.importcsv', name='importcsv' ),
+    url(r'^baka_sync/$', 'evid.views.baka_sync', name='baka_sync'),
+    url(r'^maturanti_lock/$', 'evid.views.maturanti_lock', name='maturanti_lock'),
+    url(r'^generate_logins/$', 'evid.views.generate_logins', name='generate_logins'),
+
+
 ]
