@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+		'django.core.context_processors.csrf',
             ],
         },
     },
@@ -77,8 +78,11 @@ WSGI_APPLICATION = 'lsum.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '127.0.0.1',
+        'NAME': 'lsum_evid',
+        'USER': 'lsum',
+        'PASSWORD': 'heslo',
     }
 }
 
