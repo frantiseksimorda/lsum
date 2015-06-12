@@ -1,4 +1,4 @@
-#coding: utf8
+# -*- coding: utf-8 -*-
 from django.db import models
 from datetime import datetime
 from django.contrib import admin
@@ -67,3 +67,6 @@ class Student(models.Model):
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenti'
+
+class Document(models.Model):
+    docfile = models.FileField(upload_to='documents/%Y/%m/%d')
