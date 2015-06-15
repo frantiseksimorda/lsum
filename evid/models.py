@@ -31,6 +31,7 @@ class Kantor(models.Model):
     jmeno = models.CharField(max_length=50)
     prijmeni = models.CharField(max_length=50)
     login = models.CharField(blank=True,max_length=20)
+    default_passwd = models.CharField(max_length=50,blank=True)
     pohlavi = models.CharField(max_length=10, choices=POHLAVI_MOZNOSTI)
     kod_baka = models.CharField(max_length=20) # blank=True ???ANO/NE???
     datum_pridani = models.DateTimeField(default=datetime.now, blank=True)
@@ -51,6 +52,7 @@ class Student(models.Model):
     jmeno = models.CharField(max_length=50)
     prijmeni = models.CharField(max_length=50)
     login = models.CharField(max_length=20,blank=True)
+    default_passwd = models.CharField(max_length=50,blank=True)
     pohlavi = models.CharField(max_length=10, choices=POHLAVI_MOZNOSTI)
     kod_baka = models.CharField(max_length=20)
     trida = models.ForeignKey(Trida)
