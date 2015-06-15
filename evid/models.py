@@ -4,71 +4,75 @@ from datetime import datetime
 from django.contrib import admin
 
 
-POHLAVI_MOZNOSTI = (
+SEX_CHOICES = (
 ('M', 'Muž'),
 ('Z', 'Zena.'),
 )
 
 
-class Trida(models.Model):
+class School_class(models.Model):
     """ Trida """
-    zkratka = models.CharField(max_length=5)
-    rok = models.DateField('')
-    pismenko = models.CharField(max_length=2)
-    delka_studia = models.IntegerField()
-    rok_zalozeni = models.DateField()
+    short_name = models.CharField(max_length=5)
+    start_year = models.DateField('')
+    letter = models.CharField(max_length=2)
+    length_of_studdy = models.IntegerField()
+    # start_year = models.DateField()
 
     def __unicode__(self):
-        return self.zkratka
+        return self.short_name
 
-    class Meta:
-        verbose_name = 'trida'
-        verbose_name_plural = 'tridy'
+    # class Meta:
+    #     verbose_name = 'Class'
+    #     verbose_name_plural = 'Classes'
 
 
-class Kantor(models.Model):
+class Teacher(models.Model):
     """ Kantori """
-    jmeno = models.CharField(max_length=50)
-    prijmeni = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
     login = models.CharField(blank=True,max_length=20)
     default_passwd = models.CharField(max_length=50,blank=True)
-    pohlavi = models.CharField(max_length=10, choices=POHLAVI_MOZNOSTI)
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20) # blank=True ???ANO/NE???
-    datum_pridani = models.DateTimeField(default=datetime.now, blank=True)
-    cip = models.CharField(blank=True,max_length=20)
+    add_date = models.DateTimeField(default=datetime.now, blank=True)
+    chip = models.CharField(blank=True,max_length=20)
     email = models.EmailField(blank=True)
-    aktivni = models.BooleanField()
+    active = models.BooleanField()
 
     def __unicode__(self):
-        return self.jmeno
+        return self.name
 
-    class Meta:
-        verbose_name = 'kantor'
-        verbose_name_plural = 'kantori'
+    # class Meta:
+    #     verbose_name = 'teacher'
+    #     verbose_name_plural = 'teachers'
 
 
 class Student(models.Model):
     """ Studenti """
-    jmeno = models.CharField(max_length=50)
-    prijmeni = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
     login = models.CharField(max_length=20,blank=True)
     default_passwd = models.CharField(max_length=50,blank=True)
-    pohlavi = models.CharField(max_length=10, choices=POHLAVI_MOZNOSTI)
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20)
-    trida = models.ForeignKey(Trida)
-    datum_pridani = models.DateTimeField(default=datetime.now, blank=True)
-    cip = models.CharField(max_length=20,blank=True)
+    school_class = models.ForeignKey(School_class)
+    add_date = models.DateTimeField(default=datetime.now, blank=True)
+    rfid = models.CharField(max_length=20,blank=True)
     email = models.EmailField(blank=True)
-    aktivni = models.BooleanField()
+    active = models.BooleanField()
 
+    def save(self, *args, **kwargs):
+        """ Custumize  """
+        self.name = self.name + "blabla"
+        super(Student, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return self.jmeno
+        return self.name
 
 
-    class Meta:
-        verbose_name = 'student'
-        verbose_name_plural = 'studenti'
+    # class Meta:
+    #     verbose_name = 'student'
+    #     verbose_name_plural = 'students'
 
 class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y/%m/%d')
