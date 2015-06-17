@@ -1,6 +1,5 @@
 # coding: utf8
 
-from os.path import dirname
 import pymssql
 import psycopg2
 
@@ -22,12 +21,11 @@ __author__ = "karlosss"
 #
 # TODO: exceptions
 
-
 class Connection:
 
     def __init__(self, target):
 
-        f = open(dirname(__file__) + '/../connections.pwd')
+        f = open('connections.pwd')
 
         content = []
 
@@ -55,7 +53,7 @@ class Connection:
             else:
                 parsed_content[len(parsed_content)-1][line.split(":")[0].strip()] = line.split(":")[1].strip()
 
-        data = {}
+        connection_data = {}
 
         # finding the desired connection
         for data in parsed_content:
@@ -63,36 +61,36 @@ class Connection:
             # searches for the desired connection
             if data["name"] == target:
                 for line in data:
-                    data[line] = data[line]
+                    connection_data[line] = data[line]
 
                 # handling optional argument, port
-                if "port" not in data:
-                    data["port"] = ""
+                if "port" not in connection_data:
+                    connection_data["port"] = ""
                 else:
-                    if data["type"] == "MSSQL":
-                        data["port"] = ":" + data["port"]
+                    if connection_data["type"] == "MSSQL":
+                        connection_data["port"] = ":" + connection_data["port"]
 
                 if "charset" not in data:
-                    data["charset"] = ""
+                    connection_data["charset"] = ""
 
         # connects to the desired connection
-        if data["type"] == "MSSQL":
+        if connection_data["type"] == "MSSQL":
             connection = pymssql.connect(
-                host=data["ip"] + data["port"],
-                user=data["user"],
-                password=data["password"],
-                database=data["database"],
-                charset=data["charset"],
+                host=connection_data["ip"] + connection_data["port"],
+                user=connection_data["user"],
+                password=connection_data["password"],
+                database=connection_data["database"],
+                charset=connection_data["charset"],
             )
 
-        elif data["type"] == "PostgreSQL":
+        elif connection_data["type"] == "PostgreSQL":
             connection = psycopg2.connect(
-                host=data["ip"],
-                port=data["port"],
-                user=data["user"],
-                password=data["password"],
-                dbname=data["database"],
-                client_encoding=data["charset"],
+                host=connection_data["ip"],
+                port=connection_data["port"],
+                user=connection_data["user"],
+                password=connection_data["password"],
+                dbname=connection_data["database"],
+                client_encoding=connection_data["charset"],
             )
 
         # prepares the cursor
