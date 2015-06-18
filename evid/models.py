@@ -2,14 +2,12 @@
 from django.db import models
 from datetime import datetime
 from django.contrib import admin
+from django.utils import timezone
 
 
 SEX_CHOICES = (
 ('M', 'Muž'),
 ('Z', 'Zena.'),
-('A', 'Anální'),
-('O', 'Orální'),
-('H', 'Homosexuální'),
 )
 
 
@@ -42,7 +40,7 @@ class Teacher(models.Model):
     default_passwd = models.CharField(max_length=50,blank=True)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20) # blank=True ???ANO/NE???
-    add_date = models.DateTimeField(default=datetime.now, blank=True)
+    add_date = models.DateTimeField(auto_now_add=True)
     chip = models.CharField(blank=True,max_length=20)
     email = models.EmailField(blank=True)
     active = models.BooleanField()
@@ -61,7 +59,7 @@ class Student(models.Model):
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
-    add_date = models.DateTimeField(default=datetime.now, blank=True)
+    add_date = models.DateTimeField(auto_now_add=True)
     rfid = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     active = models.BooleanField()
