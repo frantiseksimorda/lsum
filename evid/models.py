@@ -13,17 +13,22 @@ SEX_CHOICES = (
 class School_class(models.Model):
     """ Trida """
     short_name = models.CharField(max_length=5)
-    start_year = models.DateField('')
-    letter = models.CharField(max_length=2)
-    length_of_studdy = models.IntegerField()
-    # start_year = models.DateField()
+    start_year = models.DateField(auto_now_add=True)
+    letter = models.CharField(max_length=2, editable=False)
+    length_of_studdy = models.IntegerField(editable=False)
 
     def __unicode__(self):
         return self.short_name
 
-    # class Meta:
-    #     verbose_name = 'Class'
-    #     verbose_name_plural = 'Classes'
+    def save(self, *args, **kwargs):
+        """ Custumize  save process """
+        self.letter = self.short_name[:1]
+        if self.short_name[0] == "R":
+            self.length_of_studdy = 8
+        else:
+            self.length_of_studdy = 4
+        super(School_class, self).save(*args, **kwargs)
+
 
 
 class Teacher(models.Model):
@@ -42,9 +47,6 @@ class Teacher(models.Model):
     def __unicode__(self):
         return self.name
 
-    # class Meta:
-    #     verbose_name = 'teacher'
-    #     verbose_name_plural = 'teachers'
 
 
 class Student(models.Model):
@@ -57,22 +59,18 @@ class Student(models.Model):
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
     add_date = models.DateTimeField(default=datetime.now, blank=True)
-    rfid = models.CharField(max_length=20,blank=True)
+    rfid = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     active = models.BooleanField()
 
     def save(self, *args, **kwargs):
-        """ Custumize  """
-        self.name = self.name + "blabla"
+        """ Custumize  save process """
+        self.name = self.name
         super(Student, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.name
 
-
-    # class Meta:
-    #     verbose_name = 'student'
-    #     verbose_name_plural = 'students'
 
 class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y/%m/%d')
