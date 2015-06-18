@@ -7,6 +7,9 @@ from django.contrib import admin
 SEX_CHOICES = (
 ('M', 'Muž'),
 ('Z', 'Zena.'),
+('A', 'Anální'),
+('O', 'Orální'),
+('H', 'Homosexuální'),
 )
 
 

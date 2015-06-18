@@ -99,11 +99,11 @@ class Connection:
     def execute(self, query):
 
         # escape the following statements in queries
-        if "INSERT" not in query and \
-           "DELETE" not in query and \
-           "UPDATE" not in query and \
-           "DROP" not in query and \
-           "CREATE" not in query and \
+        if "INSERT" not in query.upper() and \
+           "DELETE" not in query.upper() and \
+           "UPDATE" not in query.upper() and \
+           "DROP" not in query.upper() and \
+           "CREATE" not in query.upper() and \
            ";" not in query:
                 self.cursor.execute(query)
         else:
