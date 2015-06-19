@@ -24,10 +24,8 @@ class School_class(models.Model):
     def save(self, *args, **kwargs):
         """ Custumize  save process """
         self.letter = self.short_name[:1]
-        if self.short_name[0] == "R":
-            self.length_of_studdy = 8
-        else:
-            self.length_of_studdy = 4
+        self.length_of_studdy = 8 if self.short_name[0] == "R" else 4
+
         super(School_class, self).save(*args, **kwargs)
 
 
@@ -66,7 +64,6 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
         """ Custumize  save process """
-        self.name = self.name
         super(Student, self).save(*args, **kwargs)
 
     def __unicode__(self):

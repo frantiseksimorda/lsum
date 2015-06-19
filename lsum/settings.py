@@ -81,8 +81,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '127.0.0.1',
         'NAME': 'lsum_evid',
-        'USER': 'lsum',
-        'PASSWORD': 'heslo',
+        'USER': 'root',
+        'PASSWORD': 'asdf',
     }
 }
 
