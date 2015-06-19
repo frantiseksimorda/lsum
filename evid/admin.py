@@ -2,7 +2,11 @@ from django.contrib import admin
 from models import Student, Teacher, School_class
 
 class studentAdmin(admin.ModelAdmin):
-    list_display = ("surname", "name", "school_class")
+    list_display = ("id", "surname", "name", "school_class")
+    list_display_links = ('surname', )
+    search_fields = ('surname',)
+
+
 
 admin.site.register(Student, studentAdmin)
 
