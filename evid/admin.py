@@ -16,7 +16,7 @@ admin.site.register(Teacher, teacherAdmin)
 
 
 class schoolClassAdmin(admin.ModelAdmin):
-    list_display = ("short_name", )
+    list_display = ("short_name", "id" )
 
 admin.site.register(School_class, schoolClassAdmin)
 
