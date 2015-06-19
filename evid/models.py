@@ -7,7 +7,7 @@ from django.utils import timezone
 
 SEX_CHOICES = (
 ('M', 'Muž'),
-('Z', 'Zena.'),
+('Z', 'Zena'),
 )
 
 
