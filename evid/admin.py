@@ -7,16 +7,18 @@ class studentAdmin(admin.ModelAdmin):
     search_fields = ('surname',)
 
 
-
 admin.site.register(Student, studentAdmin)
 
-class kantorAdmin(admin.ModelAdmin):
+class teacherAdmin(admin.ModelAdmin):
     list_display = ("surname", "name")
 
-admin.site.register(Teacher, kantorAdmin)
+admin.site.register(Teacher, teacherAdmin)
 
 
-admin.site.register(School_class)
+class schoolClassAdmin(admin.ModelAdmin):
+    list_display = ("short_name", )
+
+admin.site.register(School_class, schoolClassAdmin)
 
 
 
