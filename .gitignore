@@ -1,2 +1,4 @@
 *.pyc
 *.pwd
+settings.py
+lsum/settings.py
