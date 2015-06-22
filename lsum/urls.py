@@ -25,4 +25,8 @@ urlpatterns = [
     url(r'^generate_logins/$', 'evid.views.generate_logins', name='generate_logins'),
 
 
+
 ]
+
+def bakasync(request):
+    """" Sync z Bakalaru """

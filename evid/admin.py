@@ -3,8 +3,8 @@ from models import Student, Teacher, School_class
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ("id", "surname", "name", "school_class")
-    list_display_links = ('surname', )
-    search_fields = ('surname',)
+    list_display_links = ("surname", )
+    search_fields = ("surname", )
 
 
 admin.site.register(Student, StudentAdmin)
