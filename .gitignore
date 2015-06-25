@@ -2,3 +2,4 @@ lsum/settings.py
 settings.py
 *.pyc
 *.pwd
+*.csv
