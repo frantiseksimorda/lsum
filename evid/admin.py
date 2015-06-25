@@ -6,8 +6,8 @@ from misc import stringList
 
 class Student_admin(admin.ModelAdmin):
     list_display = ("id", "surname", "name", "school_class")
-    list_display_links = ('surname', )
-    search_fields = ('surname',)
+    list_display_links = ("surname", )
+    search_fields = ("surname", )
 
 
 class Teacher_admin(admin.ModelAdmin):

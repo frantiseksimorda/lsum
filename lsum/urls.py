@@ -19,10 +19,13 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^importcsv/', 'evid.views.importcsv', name='importcsv' ),
     url(r'^baka_sync/$', 'evid.views.baka_sync', name='baka_sync'),
     url(r'^maturanti_lock/$', 'evid.views.maturanti_lock', name='maturanti_lock'),
     url(r'^generate_logins/$', 'evid.views.generate_logins', name='generate_logins'),
 
 
+
 ]
+
+def bakasync(request):
+    """" Sync z Bakalaru """
