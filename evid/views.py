@@ -5,9 +5,6 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
-from .models import Document
-from .forms import DocumentForm
-
 
 def baka_sync(request):
     """ Sync users with Bakalari MSSQL database, add new studenst from new classes"""
