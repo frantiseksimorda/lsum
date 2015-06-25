@@ -34,13 +34,13 @@ class Teacher(models.Model):
     """ Kantori """
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
-    login = models.CharField(blank=True,max_length=20)
-    default_passwd = models.CharField(max_length=50,blank=True)
+    login = models.CharField(null=True,max_length=20)
+    default_passwd = models.CharField(max_length=50,null=True)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20) # blank=True ???ANO/NE???
     add_date = models.DateTimeField(auto_now_add=True)
-    chip = models.CharField(blank=True,max_length=20)
-    email = models.EmailField(blank=True)
+    chip = models.CharField(null=True,max_length=20)
+    email = models.EmailField(null=True)
     active = models.BooleanField()
 
     def __unicode__(self):
@@ -52,15 +52,10 @@ class Student(models.Model):
     """ Studenti """
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
-    login = models.CharField(max_length=20,blank=True)
-    default_passwd = models.CharField(max_length=50,blank=True)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
-    add_date = models.DateTimeField(auto_now_add=True)
-    rfid = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
-    active = models.BooleanField()
+    rfid = models.CharField(max_length=20, null=True)
 
     def save(self, *args, **kwargs):
         """ Custumize  save process """
@@ -69,6 +64,23 @@ class Student(models.Model):
     def __unicode__(self):
         return self.name
 
+class User_account_student(models.Model):
+    kod_baka = models.CharField(max_length=20)
+    login = models.CharField(max_length=50, null=True, editable=False)
+    default_passwd = models.CharField(max_length=50, null=True, editable=False)
+    isActive = models.NullBooleanField(null=True, editable=False)
+    banTime = models.DateTimeField(null=True, editable=False)
+    unbanTime = models.DateTimeField(null=True, editable=False)
+    autoDeleteTime = models.DateTimeField(null=True, editable=False)
+    email = models.EmailField(null=True)
+
+class Ban_reason(models.Model):
+    """Duvody zabanovani uctu"""
+    reason = models.CharField(max_length=50)
+    duration = models.DurationField(null=True)
+
+    def __unicode__(self):
+        return self.reason
 
 class Document(models.Model):
     docfile = models.FileField(upload_to='documents/%Y/%m/%d')
