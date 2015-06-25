@@ -4,3 +4,4 @@ lsum/settings.py
 *.pwd
 settings.py
 lsum/settings.py
+*.csv
