@@ -91,7 +91,7 @@ def baka_sync(request):
                 kod_baka=line[3],
                 school_class_id=get_class_id(line[4]),
                 rfid=line[5],
-                active=True,
+                # active=True,
             )
 
             student.save()
