@@ -6,8 +6,8 @@ Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
 - Install `python2-django` package
 - Install `git` package
 - Install `pip2` prackage
-- Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`) [`pymssql`](http://www.pymssql.org/en/latest/), [`python2-psycopg2`](http://initd.org/psycopg/) and [`django-import-export`](https://github.com/django-import-export/django-import-export) packages, we recomand via system package manager or python2-pip
-- Execute `pip2 install argument`, replacing the argument with the following:
+- Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`)
+- Execute `pip2 install argument`, replacing the `argument` with the following:
   -  `pymssql`
   -  `python2-psycopg2`
   -  `django-import-export`
