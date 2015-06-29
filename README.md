@@ -2,11 +2,16 @@
 Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
 
 # Installation
+- Install `python2` package
+- Install `python2-django` package
 - Install `git` package
-- Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`)
-- Install [`python2`](https://www.python.or), [`python2-django`](https://www.djangoproject.com/), [`pymssql`](http://www.pymssql.org/en/latest/), [`python2-psycopg2`](http://initd.org/psycopg/) and [`django-import-export`](https://github.com/django-import-export/django-import-export) packages, we recomand via system package manager or python2-pip
+- Install `pip2` prackage
+- Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`) [`pymssql`](http://www.pymssql.org/en/latest/), [`python2-psycopg2`](http://initd.org/psycopg/) and [`django-import-export`](https://github.com/django-import-export/django-import-export) packages, we recomand via system package manager or python2-pip
+- Execute `pip2 install argument`, replacing the argument with the following:
+  -  `pymssql`
+  -  `python2-psycopg2`
+  -  `django-import-export`
+  -  `django-overextends`
+- Replace your `python27/site-packages/overextends/templatetags/overextends_tags.py` with [`this file`](https://github.com/stephenmcd/django-overextends/blob/master/overextends/templatetags/overextends_tags.py)
 - Execute `python2 manage.py runserver`
 - Open your browser at `http://localhost:8000/admin`
-
-
-
