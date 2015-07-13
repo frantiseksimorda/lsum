@@ -96,18 +96,21 @@ class Connection:
         # prepares the cursor
         self.cursor = connection.cursor()
 
-    def execute(self, query):
+    def execute(self, query, protected=True):
 
-        # escape the following statements in queries
-        if "INSERT" not in query.upper() and \
-           "DELETE" not in query.upper() and \
-           "UPDATE" not in query.upper() and \
-           "DROP" not in query.upper() and \
-           "CREATE" not in query.upper() and \
+        # escape the following statements in queries if protected
+        if "INSERT " not in query.upper() and \
+           "DELETE " not in query.upper() and \
+           "UPDATE " not in query.upper() and \
+           "DROP " not in query.upper() and \
+           "CREATE " not in query.upper() and \
            ";" not in query:
                 self.cursor.execute(query)
         else:
+            if protected:
                 raise Exception("YOU SHALL NOT PASS!!!")
+            else:
+                self.cursor.execute(query)
 
         return self.cursor.fetchall()
 

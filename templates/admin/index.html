@@ -1,0 +1,16 @@
+{% overextends "admin/index.html" %}
+{% load i18n admin_urls %}
+
+{% block content  %}
+
+    {{ block.super }}
+    <form action="print_papers_students/">
+        <input type="submit" value="Print papers (students)">
+    </form>
+
+    <form action="match_rfids/">
+        <input type="submit" value="Match RFIDs">
+    </form>
+
+{% endblock %}
+

@@ -20,11 +20,11 @@ existing_logins = stringList(User_account_student.objects.values_list("login"))
 
 def shorten(x, length):
     # first chars of string x, normalized, lowercase; if shorter than 3, automatically extended by xs from the right
-    x = x[:3].rstrip()
+    x = x[:length].rstrip()
     x = normalize('NFKD', x).encode('ascii', 'ignore')
     x = x.lower()
 
-    while len(x) < 3:
+    while len(x) < length:
         x += "x"
 
     return x
