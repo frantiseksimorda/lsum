@@ -5,7 +5,7 @@ from import_export.admin import ImportExportActionModelAdmin
 from misc import stringList
 
 class Student_admin(admin.ModelAdmin):
-    list_display = ("id", "surname", "name", "school_class")
+    list_display = ("id", "surname", "name", "school_class", "rfid")
     list_display_links = ("surname", )
     search_fields = ("surname", )
 

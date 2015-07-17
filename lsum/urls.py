@@ -21,4 +21,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/print_papers_students/$', 'evid.views.print_papers_students'),
     url(r'^admin/match_rfids/$', 'evid.views.match_rfids'),
+    url(r'^admin/match_rfids_all/$', 'evid.views.match_rfids_all'),
+    url(r'^admin/match_rfids_one/$', 'evid.views.match_rfids_one'),
+    url(r'^admin/match_rfids_student/$', 'evid.views.match_rfids_student'),
 ]

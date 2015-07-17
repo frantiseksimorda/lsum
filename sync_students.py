@@ -35,7 +35,6 @@ for line in data:
             sex=line[2],
             kod_baka=line[3],
             school_class_id=get_class_id(line[4]),
-            rfid=line[5],
         )
 
         student.save()

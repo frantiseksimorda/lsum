@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+    </head>
+
+    <body>
+        {% if message %}
+            <span style="color: #FF0000"><b>{{ message }}</b></span>
+        {% endif%}
+
+        <p>Vyberte studenta:</p>
+
+        <form action="/admin/match_rfids_student/" method="post">
+            {% csrf_token %}
+            {{ form1 }}
+            <input name="submit1" type="submit" value="Submit" />
+        </form>
+
+        <br><br><br>
+        {% if scanned %}
+
+            {% if item %}
+                <p>Student: <b>{{ item.name }}{{ item.surname }}({{ item.school_class }}), {{ item.kod_baka }}</b></p>
+                {% if item.rfid %}
+                    <p>Číslo čipu studenta: <span style="color: #008800"><b>{{ item.rfid }}</b></span></p>
+                {% else %}
+                    <p>Číslo čipu studenta: <span style="color: #FF0000"><b>Čip nepřiřazen</b></span></p>
+                {% endif %}
+            {% endif %}
+
+            <br><br>
+
+            <p>Co chcete s tímto studentem udělat?</p>
+
+            {% if item.rfid %}
+                <form action="/admin/match_rfids_student/" method="post">
+                    {% csrf_token %}
+                    {{ form2 }}
+                    <input name="submit2" type="submit" value="Odebrat čip" />
+                </form>
+            {% else %}
+                <form action="/admin/match_rfids_student/" method="post">
+                    {% csrf_token %}
+                    {{ form3 }}
+                    <input name="submit3" type="submit" value="Přiřadit čip" />
+                </form>
+            {% endif %}
+
+        {% endif %}
+
+        <br><br>
+
+        <p><a href="/admin/match_rfids/">Zpět</a></p>
+
+
+    </body>
+
+</html>

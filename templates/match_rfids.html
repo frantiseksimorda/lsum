@@ -7,6 +7,24 @@
     </head>
 
     <body>
+        <p>Vítá vás průvodce přiřazováním čipů.</p>
+        <p>Nepřiřazený čip má <b>{{ count_unmatched }}</b> studentů.</p>
+
+        <br>
+        {% if chrome %}
+            <p><a href="/admin/print_papers_students">Vytisknout štítky pro nové studenty</a></p>
+        {% else %}
+            <p><s>Vytisknout štítky pro nové studenty</s> (funkce k dispozici pouze v Chrome)</p>
+        {% endif %}
+        <p><a href="/admin/match_rfids_all">Přiřadit čipy novým studentům</a></p>
+        <br>
+        <p><a href="/admin/match_rfids_one">Správa jednotlivého čipu</a></p>
+        <p><a href="/admin/match_rfids_student">Správa jednotlivého studenta</a></p>
+
+        <br>
+
+        <p><a href="/admin/">Zpět do administrace</a></p>
+
 
     </body>
 

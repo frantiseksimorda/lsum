@@ -111,6 +111,8 @@ class Connection:
                 raise Exception("YOU SHALL NOT PASS!!!")
             else:
                 self.cursor.execute(query)
-
-        return self.cursor.fetchall()
+        try:
+            return self.cursor.fetchall()
+        except:
+            print "Query executed successfully."
 
