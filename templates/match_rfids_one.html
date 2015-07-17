@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+    </head>
+
+    <body>
+        <p>Načtěte čip:</p>
+
+        <form action="/admin/match_rfids_one/" method="post">
+            {% csrf_token %}
+            {{ form1 }}
+            <input name="submit1" type="submit" value="Submit" />
+        </form>
+
+        <br><br><br>
+
+        {% if scanned %}
+                Číslo čipu: <b>{{ chip }}</b>
+            {% if owner %}
+                <p>Majitel čipu: <span style="color: #008800"><b>{{ owner.name }}{{ owner.surname }}({{ owner.school_class }}), {{ owner.kod_baka }}</b></span></p>
+            {% else %}
+                <p>Majitel čipu: <span style="color: #FF0000"><b>Nikdo</b></span></p>
+            {% endif %}
+
+            <br><br>
+
+            <p>Co chcete s tímto čipem udělat?</p>
+
+            {% if owner %}
+                <form action="/admin/match_rfids_one/" method="post">
+                    {% csrf_token %}
+                    {{ form2 }}
+                    <input name="submit2" type="submit" value="Odebrat současnému majiteli" />
+                </form>
+
+                <br>
+
+                <form action="/admin/match_rfids_one/" method="post">
+                    {% csrf_token %}
+                    {{ form3 }}
+                    <input name="submit3" type="submit" value="Přiřadit jinému majiteli" />
+                </form>
+            {% else %}
+                <form action="/admin/match_rfids_one/" method="post">
+                    {% csrf_token %}
+                    {{ form3 }}
+                    <input name="submit3" type="submit" value="Přiřadit novému majiteli" />
+                </form>
+            {% endif %}
+
+        {% endif %}
+
+        <br><br>
+
+        <p><a href="/admin/match_rfids/">Zpět</a></p>
+
+    </body>
+
+</html>

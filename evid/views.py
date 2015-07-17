@@ -1,157 +1,242 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponseRedirect
-from evid.models import Student, School_class, User_account_student
-from connection import Connection
+
+from __future__ import unicode_literals
+from .models import Student
+from django.shortcuts import render
+from .forms import RfidScanForm, RfidAssignToAnotherOwnerForm, RfidSelectStudentForm, RfidRemoveFromStudentForm, RfidAssignSingleScanForm
 from misc import stringList
-from random import randint
-from hashlib import sha512
-from unicodedata import normalize
+from django import forms
+from user_agents import parse
 
 
-def baka_sync(request):
-    """ Sync users with Bakalari MSSQL database, add new studenst from new classes"""
-    # connection and query to the source database
-    conn = Connection("bakalari")
-    data = conn.execute("SELECT trida FROM zaci")
+def print_papers_students(request):
 
-    # selecting each class, appending it only once
-    classes = []
+    data = list(Student.objects.raw("""
+                              SELECT * FROM evid_student
+                              INNER JOIN evid_user_account_student
+                              ON evid_student.kod_baka = evid_user_account_student.kod_baka
+                        """))
 
-    for line in data:
-        if line[0] not in classes:
-            classes.append(line[0])
+    while divmod(len(data), 40)[1] != 0:
+        data.append("")
 
-    # editing the list to look nicer :)
-    classes.sort()
-    classes.reverse()
-
-    # parsing classes to the correct format for insertion
-    existing_classes = School_class.objects.values_list("short_name")
-    existing_classes_parsed = []
-
-    for item in existing_classes:
-        existing_classes_parsed.append(item[0])
-
-    # inserting to the school_class table of the Django DB
-    for item in classes:
-        if item not in existing_classes_parsed:
-            school_class = School_class(short_name=item)
-            school_class.save()
-
-    def get_class_id(class_name):
-
-        return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
+    return render(request, "print_papers_students.html", {"elements": data})
 
 
-    conn = Connection("bakalari")
-    data = conn.execute("SELECT jmeno, prijmeni, pohlavi, intern_kod, trida, isic_cip FROM zaci")
+def match_rfids(request):
+
+    count_unmatched = len(Student.objects.filter(rfid=""))
+
+    meta = parse(request.META['HTTP_USER_AGENT'])
+    chrome = (meta.browser.family).lower() == "chrome"
 
 
-    existing_codes = Student.objects.values_list("kod_baka")
-    existing_codes_parsed = []
-
-    for item in existing_codes:
-        existing_codes_parsed.append(item[0])
-
-
-    for line in data:
-
-        if line[3] not in existing_codes_parsed:
-
-            student = Student(
-                name=line[0],
-                surname=line[1],
-                sex=line[2],
-                kod_baka=line[3],
-                school_class_id=get_class_id(line[4]),
-                rfid=line[5],
-                # active=True,
-            )
-
-            student.save()
-
-    return HttpResponseRedirect("/admin/evid/student")
+    return render(request, 'match_rfids.html',
+                  {'count_unmatched': count_unmatched,
+                   'chrome': chrome
+                   })
 
 
-def maturanti_lock(request):
-    """ lock users logins of thoses, who sucessfully end school"""
-    return request
+def match_rfids_all(request):
+
+    if request.method == "POST":
+        form = RfidScanForm(request.POST)
+
+    else:
+        form = RfidScanForm()
+
+    count_unmatched = len(Student.objects.filter(rfid=""))
+
+    if count_unmatched == 0:
+                message_color = "#008800"
+                message = "Všichni studenti již mají čip přiřazen."
+
+                return render(request, 'match_rfids_all.html',
+                  {'form': form,
+                   'message': message,
+                   'message_color': message_color,
+                   })
+
+    active_student = Student.objects.filter(rfid="")[0]
+
+    if form.is_valid():
+        chip = form.cleaned_data["Chip"]
+
+        if chip not in stringList(Student.objects.values_list("rfid")):
+            Student.objects.filter(kod_baka=active_student.kod_baka).update(rfid=chip)
+            message = "Čip úspěšně uložen: "+active_student.name+" "+active_student.surname+" ("+str(active_student.school_class)+")."
+            count_unmatched = len(Student.objects.filter(rfid=""))
+
+            if count_unmatched == 0:
+                message_color = "#008800"
+                message = "Všichni studenti již mají čip přiřazen."
+
+                return render(request, 'match_rfids_all.html',
+                  {'form': form,
+                   'message': message,
+                   'message_color': message_color,
+                   })
+
+            active_student = Student.objects.filter(rfid="")[0]
+
+            message_color = "#008800"
+        else:
+            x = Student.objects.filter(rfid=chip)[0]
+            message = "Čip je již zaevidován: "+x.name+" "+x.surname+" ("+str(x.school_class)+"), "+x.kod_baka+". Vyberte jiný."
+            message_color = "#FF0000"
+
+        form = RfidScanForm()
+
+    else:
+        message = False
+        message_color = False
+
+    return render(request, 'match_rfids_all.html',
+                  {'form': form,
+                   'active_student': active_student,
+                   'message': message,
+                   'message_color': message_color,
+                   'count_unmatched': count_unmatched,
+                   })
+
+def match_rfids_one(request):
+
+    owner = False
+    scanned = False
+    chip = False
+
+    form1 = RfidScanForm()
+    form2 = RfidScanForm(request.POST)
+    form3 = RfidAssignToAnotherOwnerForm(request.POST)
+
+    form2.fields['Chip'].widget = forms.HiddenInput()
+    form3.fields['Chip'].widget = forms.HiddenInput()
+
+    if request.method == "POST":
+
+        if "submit1" in request.POST:
+            form1 = RfidScanForm(request.POST)
+            if form1.is_valid():
+                chip = form1.cleaned_data["Chip"]
+                owner = Student.objects.filter(rfid=chip)
+                if len(owner) > 0:
+                    owner = owner[0]
+                else:
+                    owner = False
+
+                form1 = RfidScanForm()
+                scanned = True
+
+        elif "submit2" in request.POST:
+            form2 = RfidScanForm(request.POST)
+            form2.fields['Chip'].widget = forms.HiddenInput()
+
+            if form2.is_valid():
+                chip = form2.cleaned_data["Chip"]
+                Student.objects.filter(rfid=chip).update(rfid="")
+                owner = False
+                scanned = True
+
+        elif "submit3" in request.POST:
+            form3 = RfidAssignToAnotherOwnerForm(request.POST)
+            form3.fields['Chip'].widget = forms.HiddenInput()
+
+            if form3.is_valid():
+                chip = form3.cleaned_data["Chip"]
+                student_id = form3.cleaned_data["Select"]
+                Student.objects.filter(rfid=chip).update(rfid="")
+                Student.objects.filter(id=student_id).update(rfid=chip)
+                owner = Student.objects.filter(rfid=chip)[0]
+                scanned = True
+            else:
+                owner = False
+                scanned = False
+
+        else:
+            owner = False
+            scanned = False
+
+    else:
+        form1 = RfidScanForm()
+        owner = False
+        scanned = False
+
+    return render(request, 'match_rfids_one.html',
+                  {'form1': form1,
+                   'form2': form2,
+                   'form3': form3,
+                   'owner': owner,
+                   'scanned': scanned,
+                   'chip': chip})
 
 
-def generate_logins(request):
-    """ after sync with bakalari (imported new users), generate new usernames and password for new classes """
+def match_rfids_student(request):
 
-    baka_codes = stringList(Student.objects.values_list("kod_baka"))
-    login_codes = stringList(User_account_student.objects.values_list("kod_baka"))
-    existing_logins = stringList(User_account_student.objects.values_list("login"))
+    item = False
+    message = False
+
+    form1 = RfidSelectStudentForm()
+    form2 = RfidRemoveFromStudentForm()
+    form3 = RfidAssignSingleScanForm()
+
+    form2.fields['Student_id'].widget = forms.HiddenInput()
+    form3.fields['Student_id'].widget = forms.HiddenInput()
+
+    if request.method == "POST":
+
+        scanned = True
+
+        if "submit1" in request.POST:
+            form1 = RfidSelectStudentForm(request.POST)
+
+            if form1.is_valid():
+                student_id = form1.cleaned_data["Select"]
+                item = Student.objects.filter(id=student_id)[0]
+                form2.fields["Student_id"].initial = str(student_id)
+                form3.fields["Student_id"].initial = str(student_id)
+
+        elif "submit2" in request.POST:
+            form2 = RfidRemoveFromStudentForm(request.POST)
+            form2.fields['Student_id'].widget = forms.HiddenInput()
+
+            if form2.is_valid():
+                student_id = form2.cleaned_data["Student_id"]
+                Student.objects.filter(id=student_id).update(rfid="")
+                form1.fields["Select"].initial = student_id
+                form3.fields["Student_id"].initial = student_id
+                item = Student.objects.filter(id=student_id)[0]
+
+        elif "submit3" in request.POST:
+            form3 = RfidAssignSingleScanForm(request.POST)
+            form3.fields['Student_id'].widget = forms.HiddenInput()
+
+            if form3.is_valid():
+                chip = form3.cleaned_data["Chip"]
+                student_id = form3.cleaned_data["Student_id"]
+
+                if chip not in stringList(Student.objects.values_list("rfid")):
+                    Student.objects.filter(id=student_id).update(rfid=chip)
+                else:
+                    x = Student.objects.filter(rfid=chip)[0]
+                    message = "Čip je již zaevidován: "+x.name+" "+x.surname+" ("+str(x.school_class)+"), "+x.kod_baka+". Vyberte jiný."
+                    form3 = RfidAssignSingleScanForm()
+                    form3.fields["Student_id"].initial = student_id
+                    form3.fields['Student_id'].widget = forms.HiddenInput()
 
 
-    def shorten(x, length):
-        # first chars of string x, normalized, lowercase; if shorter than 3, automatically extended by xs from the right
-        x = x[:3].rstrip()
-        x = normalize('NFKD', x).encode('ascii', 'ignore')
-        x = x.lower()
+                form1.fields["Select"].initial = student_id
+                form2.fields["Student_id"].initial = str(student_id)
+                item = Student.objects.filter(id=student_id)[0]
 
-        while len(x) < 3:
-            x += "x"
+    else:
+        form1 = RfidSelectStudentForm()
+        scanned = False
 
-        return x
-
-
-    def generate_login(name, surname):
-
-        surname = shorten(surname, 3)
-        name = shorten(name, 2)
-        username = "x" + surname + name
-
-        counter = 1
-
-        for existing_login in existing_logins:
-            if username in existing_login:
-                counter += 1
-
-        number = "0" + str(counter) if counter < 10 else str(counter)
-
-        username += number
-
-        return username
-
-    def generate_password():
-        # takes a random seq. of a SHA512 hash of a random integer in range from 0 to 2bil.
-        random_hash = ""
-
-        while len(random_hash) < 8:
-            random_hash = sha512(str(randint(0, 2000000000))).hexdigest()
-
-        random_offset = randint(0, len(random_hash)-8)
-
-        def_pwd = random_hash[random_offset:random_offset+8]
-
-        return def_pwd
-
-
-    # write user accounts into DB
-    for code in baka_codes:
-        if code not in login_codes:
-
-            # get name and surname of the student and generate username and password
-            surname = Student.objects.values_list("surname").filter(kod_baka=code)[0][0]
-            name = Student.objects.values_list("name").filter(kod_baka=code)[0][0]
-
-            login = generate_login(name, surname)
-            password = generate_password()
-
-            # generate email
-            email = login + "@gjk.cz"
-
-            account = User_account_student(
-                kod_baka=code,
-                login=login,
-                default_passwd=password,
-                email=email,
-            )
-
-            account.save()
-            existing_logins.append(login)
-
-    return HttpResponseRedirect("/admin/evid/user_account_student/")
+    return render(request, 'match_rfids_student.html',
+                  {'form1': form1,
+                   'form2': form2,
+                   'form3': form3,
+                   'item': item,
+                   'scanned': scanned,
+                   'message': message,
+                   })

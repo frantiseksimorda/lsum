@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <style type="text/css">
+            td
+            {
+                width: 24%;
+                text-indent: 3mm;
+                font-size: 12px;
+                overflow: hidden;
+                display: inline-block;
+                white-space: nowrap;
+                padding-top: 5mm;
+            }
+
+            tr
+            {
+                height: 10.4%;
+            }
+
+            table
+            {
+                page-break-before: always;
+                height: 295mm;
+                width: 210mm;
+            }
+
+            p
+            {
+                margin-top: 0mm;
+                margin-bottom: 0mm;
+                text-indent: 10mm;
+            }
+
+            body
+            {
+                margin: 0mm;
+            }
+        </style>
+
+        <style type="text/css" media="print">
+            @page
+            {
+                size: A4;
+                margin: 0mm;
+            }
+        </style>
+    </head>
+
+    <body onload="window.print()">
+        {% block content %}
+
+            {% for item in elements %}
+
+                {% cycle '<table><tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' '<tr>' '' '' '' %}
+                    <td>
+                        {% if item.name %}
+                            <p><b>{{ item.name }}{{ item.surname }}</b></p>
+                            <p>Třída: {{ item.school_class }}</p>
+                            <p>Login: {{ item.login }}</p>
+                            <p>Heslo: {{ item.default_passwd }}</p>
+                        {% else %}
+                            <p>&nbsp;</p>
+                            <p>&nbsp;</p>
+                            <p>&nbsp;</p>
+                            <p>&nbsp;</p>
+                        {% endif %}
+                    </td>
+                {% cycle '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr>' '' '' '' '</tr></table>' %}
+
+            {% endfor %}
+
+        {% endblock %}
+    </body>
+
+</html>

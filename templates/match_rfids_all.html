@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+    </head>
+
+    <body>
+
+        {% if message %}
+            <span style="color: {{ message_color }}"><b>{{ message }}</b></span>
+        {% endif %}
+
+        <br><br><br>
+
+        {% if count_unmatched > 0 %}
+
+            <p>Načtěte čip pro studenta:</p>
+            <p><b>{{ active_student.name }}{{ active_student.surname }}({{ active_student.school_class }}), {{ active_student.kod_baka }}</b></p>
+
+            <form action="/admin/match_rfids_all/" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Submit" />
+            </form>
+
+            <p>Nepřiřazený čip má ještě <b>{{ count_unmatched }}</b> studentů.</p>
+
+        {% endif %}
+        <p><a href="/admin/match_rfids/">Zpět</a></p>
+
+    </body>
+
+</html>

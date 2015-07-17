@@ -73,6 +73,7 @@ class User_account_student(models.Model):
     unbanTime = models.DateTimeField(null=True, editable=False)
     autoDeleteTime = models.DateTimeField(null=True, editable=False)
     email = models.EmailField(null=True)
+    date_generated = models.DateTimeField(null=True, editable=False)
 
 class Ban_reason(models.Model):
     """Duvody zabanovani uctu"""
