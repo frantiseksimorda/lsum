@@ -83,3 +83,22 @@ class Ban_reason(models.Model):
     def __unicode__(self):
         return self.reason
 
+class Script(models.Model):
+    """tabulka pro skript"""
+    command = models.CharField(max_length=100, null=True)
+    arg1 = models.CharField(max_length=100, null=True)
+    arg2 = models.CharField(max_length=100, null=True)
+    arg3 = models.CharField(max_length=100, null=True)
+    arg4 = models.CharField(max_length=100, null=True)
+    arg5 = models.CharField(max_length=100, null=True)
+    arg6 = models.CharField(max_length=100, null=True)
+    arg7 = models.CharField(max_length=100, null=True)
+    arg8 = models.CharField(max_length=100, null=True)
+    arg9 = models.CharField(max_length=100, null=True)
+    arg10 = models.CharField(max_length=100, null=True)
+    username = models.CharField(max_length=100, null=True)
+    password = models.CharField(max_length=100, null=True)
+    type = models.CharField(max_length=100, null=True)
+    timestamp_written = models.DateTimeField(null=True)
+    timestamp_executed = models.DateTimeField(null=True)
+    result_code = models.IntegerField(null=True)

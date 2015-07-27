@@ -3,13 +3,28 @@
 from __future__ import unicode_literals
 from .models import Student
 from django.shortcuts import render
-from .forms import RfidScanForm, RfidAssignToAnotherOwnerForm, RfidSelectStudentForm, RfidRemoveFromStudentForm, RfidAssignSingleScanForm
-from misc import stringList
+from .forms import *
+from misc import stringList, activeBrowser
 from django import forms
-from user_agents import parse
-
 
 def print_papers_students(request):
+
+    data = list(Student.objects.raw("""
+                              SELECT * FROM evid_student
+                              INNER JOIN evid_user_account_student
+                              ON evid_student.kod_baka = evid_user_account_student.kod_baka
+                              WHERE rfid = ''
+                        """))
+
+    while divmod(len(data), 40)[1] != 0:
+        data.append("")
+
+    chrome = activeBrowser(request) == "chrome"
+
+    return render(request, "print_papers_students.html", {"elements": data, "chrome": chrome})
+
+
+def print_papers_students_all(request):
 
     data = list(Student.objects.raw("""
                               SELECT * FROM evid_student
@@ -20,16 +35,15 @@ def print_papers_students(request):
     while divmod(len(data), 40)[1] != 0:
         data.append("")
 
-    return render(request, "print_papers_students.html", {"elements": data})
+    chrome = activeBrowser(request) == "chrome"
+
+    return render(request, "print_papers_students.html", {"elements": data, "chrome": chrome})
 
 
 def match_rfids(request):
 
     count_unmatched = len(Student.objects.filter(rfid=""))
-
-    meta = parse(request.META['HTTP_USER_AGENT'])
-    chrome = (meta.browser.family).lower() == "chrome"
-
+    chrome = activeBrowser(request) == "chrome"
 
     return render(request, 'match_rfids.html',
                   {'count_unmatched': count_unmatched,
@@ -98,6 +112,7 @@ def match_rfids_all(request):
                    'message_color': message_color,
                    'count_unmatched': count_unmatched,
                    })
+
 
 def match_rfids_one(request):
 
@@ -222,7 +237,6 @@ def match_rfids_student(request):
                     form3 = RfidAssignSingleScanForm()
                     form3.fields["Student_id"].initial = student_id
                     form3.fields['Student_id'].widget = forms.HiddenInput()
-
 
                 form1.fields["Select"].initial = student_id
                 form2.fields["Student_id"].initial = str(student_id)
