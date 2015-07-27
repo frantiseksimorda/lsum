@@ -17,6 +17,15 @@ class RfidScanForm(forms.Form):
 
 
 class RfidAssignToAnotherOwnerForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(RfidAssignToAnotherOwnerForm, self).__init__(*args, **kwargs)
+        self.fields['Select'] = forms.CharField(widget=forms.Select(choices=tuple((item.id, item.surname+" "+item.name+" ("+str(item.school_class)+"), "+item.kod_baka)
+                 for item in Student.objects.all().order_by("surname"))),
+                             label="",
+                             required=False,
+                             )
+
     Chip = forms.CharField(label="")
 
     Select = forms.CharField(widget=forms.Select(choices=STUDENTS),
@@ -26,6 +35,15 @@ class RfidAssignToAnotherOwnerForm(forms.Form):
 
 
 class RfidSelectStudentForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(RfidSelectStudentForm, self).__init__(*args, **kwargs)
+        self.fields['Select'] = forms.CharField(widget=forms.Select(choices=tuple((item.id, item.surname+" "+item.name+" ("+str(item.school_class)+"), "+item.kod_baka)
+                 for item in Student.objects.all().order_by("surname"))),
+                             label="",
+                             required=False,
+                             )
+
     Select = forms.CharField(widget=forms.Select(choices=STUDENTS),
                              label="",
                              required=False,
