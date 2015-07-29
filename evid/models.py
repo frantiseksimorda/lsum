@@ -88,4 +88,6 @@ class Script(models.Model):
     command = models.CharField(max_length=1000, null=True)
     timestamp_written = models.DateTimeField(null=True)
     timestamp_executed = models.DateTimeField(null=True)
+    stdout = models.CharField(max_length=1000, null=True)
+    stderr = models.CharField(max_length=1000, null=True)
     result_code = models.IntegerField(null=True)

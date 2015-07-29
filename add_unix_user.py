@@ -4,9 +4,13 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
-from evid.models import Student, User_account_student
+from evid.models import Student, User_account_student, Script
 from connection import Connection
+from subprocess import Popen, PIPE
+from datetime import datetime
 
+command = "uname"
+arg1 = "-a"
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
@@ -16,19 +20,17 @@ def is_generated(user):
     return (user in passwd)
 
 
-def generate(username, default_passwdord, name, surname, typ_uzivatele):
+def generate(username=""):
     """ Generovani uzvatelu Unixserveru a Sambe """
-    if typ_uzivatele == "kantor":
-        group_id = "kantori" # nebo ID
-        homedir_path = "/user/kantori/"
-
-    else:
-        group_id = "studenti"
-        homedir_path = "/user/studenti/"
-
-    kod_baka = "Q"
-    # Student.object.values_list('surname', 'name').filter(kod_baka=kod_baka)
-    os.system('useradd -m /user/studenti/' + username)
+    # Script.object.values_list('command')
+    process = Popen([command, arg1], stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    script = Script(
+        timestamp_executed = datetime.now(),
+        stdout = stdout,
+        stderr = stderr,
+                    )
+    script.save()
 
 
-is_generated('fanda')
+generate('fanda')

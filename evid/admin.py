@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Student, Teacher, School_class, Ban_reason, User_account_student
+from  models import Student, Teacher, School_class, Ban_reason, User_account_student, Script
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from misc import stringList
@@ -20,7 +20,6 @@ class School_class_admin(admin.ModelAdmin):
 
 class Ban_reasons_admin(admin.ModelAdmin):
     pass
-
 
 class User_account_student_resource(resources.ModelResource):
 
@@ -56,7 +55,7 @@ admin.site.register(Teacher, Teacher_admin)
 admin.site.register(School_class, School_class_admin)
 admin.site.register(Ban_reason, Ban_reasons_admin)
 admin.site.register(User_account_student, User_accounts_student_admin)
-
+admin.site.register(Script)
 
 
 
