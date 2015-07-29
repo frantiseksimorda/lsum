@@ -85,7 +85,12 @@ class Ban_reason(models.Model):
 
 class Script(models.Model):
     """tabulka pro skript"""
-    command = models.CharField(max_length=1000, null=True)
+    user_type = models.CharField(max_length=50, null=True)
+    name = models.CharField(max_length=50, null=True)
+    surname  = models.CharField(max_length=50, null=True)
+    login = models.CharField(max_length=20, null=True)
+    default_passwd = models.CharField(max_length=1000, null=True)
+    action = models.CharField(max_length=50, null=True)
     timestamp_written = models.DateTimeField(null=True)
     timestamp_executed = models.DateTimeField(null=True)
     stdout = models.CharField(max_length=1000, null=True)
