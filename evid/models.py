@@ -55,7 +55,6 @@ class Student(models.Model):
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
-    status = models.CharField(max_length=10, null=True)
     rfid = models.CharField(max_length=20, null=True)
 
     def save(self, *args, **kwargs):
@@ -86,27 +85,14 @@ class Ban_reason(models.Model):
 
 class Script(models.Model):
     """tabulka pro skript"""
-    user_type = models.CharField(max_length=50, null=True)
-    name = models.CharField(max_length=50, null=True)
-    surname  = models.CharField(max_length=50, null=True)
-    login = models.CharField(max_length=20, null=True)
-    default_passwd = models.CharField(max_length=1000, null=True)
-    action = models.CharField(max_length=50, null=True)
-    timestamp_written = models.DateTimeField(null=True)
-    timestamp_executed = models.DateTimeField(null=True)
-    stdout = models.CharField(max_length=1000, null=True)
-    stderr = models.CharField(max_length=1000, null=True)
-    result_code = models.IntegerField(null=True)
-
-
-class Script_settings(models.Model):
-    doSync = models.BooleanField(default=True)
-    syncInterval = models.DurationField(null=True)
-    lastSync = models.DateTimeField(null=True)
-
-
-class Sync_log(models.Model):
-    date = models.DateTimeField(null=True)
-    description = models.CharField(max_length=1000, null=True)
-
-
+    user_type = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=50, null=True, blank=True)
+    surname  = models.CharField(max_length=50, null=True, blank=True)
+    login = models.CharField(max_length=20, null=True, blank=True)
+    default_passwd = models.CharField(max_length=1000, null=True, blank=True)
+    action = models.CharField(max_length=50, null=True, blank=True)
+    timestamp_written = models.DateTimeField(null=True, blank=True)
+    timestamp_executed = models.DateTimeField(null=True, blank=True)
+    stdout = models.CharField(max_length=1000, null=True, blank=True)
+    stderr = models.CharField(max_length=1000, null=True, blank=True)
+    result_code = models.IntegerField(null=True, blank=True)
