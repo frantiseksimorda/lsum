@@ -11,7 +11,6 @@ def stringList(list_of_tuples_containig_one_string):
 
     return returning
 
-
 def activeBrowser(meta_info):
 
     meta = parse(meta_info.META['HTTP_USER_AGENT'])
