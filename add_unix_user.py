@@ -9,9 +9,6 @@ from connection import Connection
 from subprocess import Popen, PIPE
 from datetime import datetime
 
-command = "uname"
-arg1 = "-a"
-
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
     file = open('/etc/passwd', 'r')
@@ -23,14 +20,19 @@ def is_generated(user):
 def generate(username=""):
     """ Generovani uzvatelu Unixserveru a Sambe """
     # Script.object.values_list('command')
-    process = Popen([command, arg1], stdout=PIPE, stderr=PIPE)
+    users_for_process = Script.objects.values_list()
+
+    process = Popen(["useradd","-m", "-G" ], stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     script = Script(
         timestamp_executed = datetime.now(),
         stdout = stdout,
         stderr = stderr,
+        result_code = 1 if not stderr else 0
                     )
     script.save()
 
+for user in Script.objects.values_list():
+    print (user)
 
-generate('fanda')
+# generate('fanda')
