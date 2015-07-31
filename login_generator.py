@@ -12,12 +12,6 @@ from random import randint
 from hashlib import sha512
 from unicodedata import normalize
 
-
-baka_codes = stringList(Student.objects.values_list("kod_baka"))
-login_codes = stringList(User_account_student.objects.values_list("kod_baka"))
-existing_logins = stringList(User_account_student.objects.values_list("login"))
-
-
 def shorten(x, length):
     # first chars of string x, normalized, lowercase; if shorter than 3, automatically extended by xs from the right
     x = x[:length].rstrip()
@@ -31,6 +25,8 @@ def shorten(x, length):
 
 
 def generate_login(name, surname):
+
+    existing_logins = stringList(User_account_student.objects.values_list("login"))
 
     surname = shorten(surname, 3)
     name = shorten(name, 2)
@@ -61,39 +57,8 @@ def generate_password():
 
     return def_pwd
 
-
-# write user accounts into DB
-for code in baka_codes:
-    if code not in login_codes:
-
-        # get name and surname of the student and generate username and password
-        surname = Student.objects.values_list("surname").filter(kod_baka=code)[0][0]
-        name = Student.objects.values_list("name").filter(kod_baka=code)[0][0]
-
-        login = generate_login(name, surname)
-        password = generate_password()
-
-        # generate email
-        email = login + "@gjk.cz"
-
-        account = User_account_student(
-            kod_baka=code,
-            login=login,
-            default_passwd=password,
-            email=email,
-        )
-
-        account.save()
-        existing_logins.append(login)
-
-
-
-
-
-
-
-
-
+def generate_email(login):
+    return login + "@gjk.cz"
 
 
 
