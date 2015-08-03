@@ -18,7 +18,7 @@ def is_generated(user):
 
 
 def generate(username=""):
-    """ Generovani uzvatelu Unixserveru a Sambe """
+    """ Generate samba users, homedirs and WWW folder  """
     users_for_process = Script.objects.values_list()
     for user in Script.objects.all():
         # print (user)
@@ -60,5 +60,38 @@ def generate(username=""):
                     result_code = 1 if not stderr else 0
                         )
 
+def disable_account():
+    """ smbpasswd -d user - disable Windows login to domain """
+    for user in Script.objects.all():
+        if not user.timestamp_executed:
+            if user.action == "disable":
+                lockUser = Popen(["smbpasswd",  "-d", user.login], stdout=PIPE, stderr=PIPE)
+                stdout, stderr = lockUser.communicate()
+
+
+
+def enable_account():
+    """ smbpasswd -e user - enable Windows login to domain """
+    for user in Script.objects.all():
+        if not user.timestamp_executed:
+            if user.action == "enable":
+                unlockUser = Popen(["smbpasswd",  "-e", user.login], stdout=PIPE, stderr=PIPE)
+                stdout, stderr = unlockUser.communicate()
+
+
+def remove_account():
+    """ remove user from system and homedir """
+    for user in Script.objects.all():
+        if not user.timestamp_executed:
+            if user.action == "remove":
+                smbRemoveUser = Popen(["smbpasswd", "-x", user.login], stdout=PIPE, stderr=PIPE)
+                stdouts, stderrs = smbRemoveUser.communicate()
+                removeUser = Popen(["userdell",  "-r", user.login], stdout=PIPE, stderr=PIPE)
+                stdout, stderr = removeUser.communicate()
+
+
+def cahange_password():
+    """ smbpasswd -a user - change password """
+    pass
 
 generate('fanda')
