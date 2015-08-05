@@ -83,4 +83,3 @@ def cahange_password():
     """ smbpasswd -a user - change password """
     pass
 
-generate('fanda')
