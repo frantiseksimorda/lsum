@@ -13,6 +13,7 @@ Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
   -  `django-import-export`
   -  `django-overextends`
   -  `user-agents`
+  -  `--upgrade google-api-python-client`
 - Replace your `python27/site-packages/overextends/templatetags/overextends_tags.py` with [this file](https://github.com/stephenmcd/django-overextends/blob/master/overextends/templatetags/overextends_tags.py)
 - Execute `python2 manage.py runserver`
 - Open your browser at `http://localhost:8000/admin`
