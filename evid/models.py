@@ -56,6 +56,7 @@ class Student(models.Model):
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
     rfid = models.CharField(max_length=20, null=True)
+    status = models.CharField(max_length=10, null=True)
 
     def save(self, *args, **kwargs):
         """ Custumize  save process """
@@ -67,13 +68,8 @@ class Student(models.Model):
 class User_account_student(models.Model):
     kod_baka = models.CharField(max_length=20)
     login = models.CharField(max_length=50, null=True, editable=False)
-    default_passwd = models.CharField(max_length=50, null=True, editable=False)
-    isActive = models.NullBooleanField(null=True, editable=False)
-    banTime = models.DateTimeField(null=True, editable=False)
-    unbanTime = models.DateTimeField(null=True, editable=False)
-    autoDeleteTime = models.DateTimeField(null=True, editable=False)
+    default_passwd = models.CharField(max_length=50, null=True, default="")
     email = models.EmailField(null=True)
-    date_generated = models.DateTimeField(null=True, editable=False)
 
 class Ban_reason(models.Model):
     """Duvody zabanovani uctu"""

@@ -41,7 +41,7 @@ class User_account_student_resource(resources.ModelResource):
         fields = ('kod_baka', 'login', 'email',)
 
 class User_accounts_student_admin(ImportExportActionModelAdmin):
-    list_display = ("kod_baka", "login", "default_passwd", "isActive", "banTime", "unbanTime", "autoDeleteTime", "email", "date_generated")
+    list_display = ("kod_baka", "login", "default_passwd", "email",)
     resource_class = User_account_student_resource
 
 

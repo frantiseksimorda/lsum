@@ -13,9 +13,9 @@ from login_generator import generate_login, generate_password, generate_email
 
 
 sync_interval = 20
-
-
 connBaka = Connection("bakalari")
+
+
 
 def get_class_id(class_name):
     return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
@@ -46,6 +46,59 @@ def fetch_data():
                     studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], j[1]))
 
     return (studenti_parsed, school_classes_parsed)
+
+def create_user_accounts():
+
+    for i in Student.objects.all():
+
+        if i.kod_baka not in stringList(User_account_student.objects.values_list("kod_baka")):
+            username = generate_login(i.name, i.surname)
+            password = generate_password()
+            email = generate_email(username)
+
+            user_account = User_account_student(
+                kod_baka=i.kod_baka,
+                login=username,
+                default_passwd=password,
+                email=email,
+            )
+            user_account.save()
+
+        else:
+            if User_account_student.objects.filter(kod_baka=i.kod_baka).values_list("default_passwd")[0][0] == "":
+                User_account_student.objects.filter(kod_baka=i.kod_baka).update(
+                    default_passwd=generate_password()
+                )
+
+
+    data = list(Student.objects.raw("""
+        SELECT evid_student.id,
+        evid_student.name,
+        evid_student.surname,
+        evid_user_account_student.login,
+        evid_user_account_student.default_passwd
+        FROM evid_student
+        INNER JOIN evid_user_account_student
+        ON evid_student.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    for i in data:
+        print i.name, i.surname, i.login, i.default_passwd
+
+    #for i in studenti:
+    #
+    #    if not user_factory.isUnixUser(i.login):
+    #        # TODO vytvor uzivatele - funkce od Fandy
+    #
+    #    if not user_factory.isGoogleUser(i.email):
+    #        # TODO vytvor uzivatele na Google
+
+def update_user_accounts():
+    pass
+
+
+
+
 
 def sync_all():
 
@@ -89,19 +142,20 @@ def sync_all():
     # - create students
     # - update students
 
+    # old students
     for i in students_to_delete:
         Student.objects.filter(kod_baka=i).delete()
-        # TODO mazání studentů - dopsat additional logic
 
+    # old classes
     for i in classes_to_delete:
         School_class.objects.filter(short_name=i).delete()
 
+    # new classes
     for i in classes_to_write:
         school_class = School_class(short_name=i)
         school_class.save()
 
     # new students
-
     for i in students_to_write:
         student = Student(
             name=i[1],
@@ -114,23 +168,7 @@ def sync_all():
         )
         student.save()
 
-        # create user account if not imported
-
-        if i[0] not in stringList(User_account_student.objects.values_list("kod_baka")):
-            username = generate_login(i[1], i[2])
-            password = generate_password()
-            email = generate_email(username)
-
-            user_account = User_account_student(
-                kod_baka=i[0],
-                login=username,
-                default_passwd=password,
-                email=email,
-            )
-            user_account.save()
-
-
-
+    # existing students
     for i in students_to_update:
         Student.objects.filter(kod_baka=i[0]).update(
             name=i[1],
@@ -141,7 +179,8 @@ def sync_all():
             status=i[5],
         )
 
-        # TODO update studentů - dopsat additional logic
+    create_user_accounts()
+    update_user_accounts()
 
 
 while True:
