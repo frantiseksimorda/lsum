@@ -4,12 +4,14 @@ from datetime import datetime
 from django.contrib import admin
 from django.utils import timezone
 
+from django.contrib.auth.models import User
+from oauth2client.django_orm import FlowField, CredentialsField
+
 
 SEX_CHOICES = (
 ('M', 'Muž'),
 ('Z', 'Zena'),
 )
-
 
 class School_class(models.Model):
     """ Trida """

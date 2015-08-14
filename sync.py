@@ -1,19 +1,20 @@
 # coding: utf8
 
+from __future__ import unicode_literals
+
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 from evid.models import Student, School_class, User_account_student
 from connection import Connection
-from misc import stringList
+from misc import stringList, UnicodeWriter
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
-
+import csv
 
 
 sync_interval = 20
-connBaka = Connection("bakalari")
 
 
 
@@ -21,6 +22,8 @@ def get_class_id(class_name):
     return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
 
 def fetch_data():
+    connBaka = Connection("bakalari")
+
     priznaky = connBaka.execute("SELECT intern_kod, druh, datum FROM histzaku ORDER BY datum DESC ")
     studenti = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, pohlavi, trida FROM zaci ORDER BY intern_kod")
     school_classes = connBaka.execute("SELECT trida FROM zaci GROUP BY trida")
@@ -70,7 +73,6 @@ def create_user_accounts():
                     default_passwd=generate_password()
                 )
 
-
     data = list(Student.objects.raw("""
         SELECT evid_student.id,
         evid_student.name,
@@ -82,26 +84,43 @@ def create_user_accounts():
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
-    for i in data:
-        print i.name, i.surname, i.login, i.default_passwd
+    #TODO vytvorit ucty neexistujici
 
-    #for i in studenti:
-    #
-    #    if not user_factory.isUnixUser(i.login):
-    #        # TODO vytvor uzivatele - funkce od Fandy
-    #
-    #    if not user_factory.isGoogleUser(i.email):
-    #        # TODO vytvor uzivatele na Google
+def create_emails():
+    #TODO TO BE MOVED TO THE DJANGO PART DUE TO THE AUTH WINDOW
 
-def update_user_accounts():
-    pass
+    data = list(Student.objects.raw("""
+        SELECT evid_student.id,
+        evid_student.name,
+        evid_student.surname,
+        evid_user_account_student.email,
+        evid_user_account_student.default_passwd
+        FROM evid_student
+        INNER JOIN evid_user_account_student
+        ON evid_student.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    with open('temp.csv', 'wb') as csvfile:
+        writer = UnicodeWriter(csvfile, quoting=csv.QUOTE_ALL)
+        writer.writerow(('', 'name', 'surname', 'email', 'password'))
+
+        for i in data:
+            name = unicode(i.name.strip())
+            surname = unicode(i.surname.strip())
+            email = unicode(i.email)
+            password = unicode(i.default_passwd)
+
+            print name, surname, email, password
+
+            writer.writerow(('', name, surname, email, password))
+
+    os.system("python2 GAM/gam.py csv temp.csv gam create user ~email firstname ~name lastname ~surname password ~password changepassword 1 org test-evid")
+
+    os.remove("temp.csv")
 
 
 
-
-
-def sync_all():
-
+def sync_lsum_db():
     data = fetch_data()
 
     actual_students = data[0]
@@ -179,18 +198,30 @@ def sync_all():
             status=i[5],
         )
 
+
+
+
+
+def update_user_accounts():
+    pass
+
+
+def run():
+    sync_lsum_db()
     create_user_accounts()
     update_user_accounts()
 
 
-while True:
+while False:
     print "probiha synchronizace, nevypinat skript!"
     timestamp = time()
-    sync_all()
+    run()
     print "synchronizace provedena "+str(asctime())
 
     while timestamp + sync_interval > time():
         pass
+
+create_emails()
 
 
 

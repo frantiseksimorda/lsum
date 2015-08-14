@@ -5,3 +5,4 @@ lsum/settings.py
 settings.py
 lsum/settings.py
 *.csv
+*.json
