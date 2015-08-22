@@ -72,6 +72,11 @@ class User_account_student(models.Model):
     login = models.CharField(max_length=50, null=True, editable=False)
     default_passwd = models.CharField(max_length=50, null=True, default="")
     email = models.EmailField(null=True)
+    email_to_create = models.BooleanField(default=True)
+    email_created = models.BooleanField(default=False)
+    email_to_disable = models.BooleanField(default=False)
+    email_disabled = models.BooleanField(default=False)
+    delete_time = models.DateTimeField(null=True, blank=True)
 
 class Ban_reason(models.Model):
     """Duvody zabanovani uctu"""
@@ -81,16 +86,23 @@ class Ban_reason(models.Model):
     def __unicode__(self):
         return self.reason
 
-class Script(models.Model):
-    """tabulka pro skript"""
+class Email_changes(models.Model):
+    """tabulka pro GAPI"""
     user_type = models.CharField(max_length=50, null=True, blank=True)
     name = models.CharField(max_length=50, null=True, blank=True)
-    surname  = models.CharField(max_length=50, null=True, blank=True)
-    login = models.CharField(max_length=20, null=True, blank=True)
+    surname = models.CharField(max_length=50, null=True, blank=True)
+    email = models.EmailField(max_length=20, null=True, blank=True)
     default_passwd = models.CharField(max_length=1000, null=True, blank=True)
     action = models.CharField(max_length=50, null=True, blank=True)
     timestamp_written = models.DateTimeField(null=True, blank=True)
     timestamp_executed = models.DateTimeField(null=True, blank=True)
-    stdout = models.CharField(max_length=1000, null=True, blank=True)
-    stderr = models.CharField(max_length=1000, null=True, blank=True)
     result_code = models.IntegerField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.email
+
+class Error_log(models.Model):
+    """logovani chyb"""
+    timestamp = models.DateTimeField(auto_now_add=True)
+    command = models.CharField(max_length=1000)
+    stderr = models.CharField(max_length=1000)

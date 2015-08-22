@@ -1,11 +1,11 @@
 from django.contrib import admin
-from  models import Student, Teacher, School_class, Ban_reason, User_account_student, Script
+from  models import Student, Teacher, School_class, Ban_reason, User_account_student, Email_changes, Error_log
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from misc import stringList
 
 class Student_admin(admin.ModelAdmin):
-    list_display = ("id", "surname", "name", "school_class", "rfid")
+    list_display = ("id", "surname", "name", "school_class", "rfid", "status")
     list_display_links = ("surname", )
     search_fields = ("surname", )
 
@@ -45,17 +45,20 @@ class User_accounts_student_admin(ImportExportActionModelAdmin):
     resource_class = User_account_student_resource
 
 
+class Email_changes_admin(admin.ModelAdmin):
+    list_display = ("email", "action")
 
-
-
-
+class Error_log_admin(admin.ModelAdmin):
+    list_display = ("timestamp", "command", "stderr")
 
 admin.site.register(Student, Student_admin)
 admin.site.register(Teacher, Teacher_admin)
 admin.site.register(School_class, School_class_admin)
 admin.site.register(Ban_reason, Ban_reasons_admin)
 admin.site.register(User_account_student, User_accounts_student_admin)
-admin.site.register(Script)
+admin.site.register(Email_changes, Email_changes_admin)
+admin.site.register(Error_log, Error_log_admin)
+
 
 
 

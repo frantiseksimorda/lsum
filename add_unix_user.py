@@ -4,28 +4,29 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
-from evid.models import Student, User_account_student, Script
-from connection import Connection
 from subprocess import Popen, PIPE
-from datetime import datetime
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
     file = open('/etc/passwd', 'r')
     passwd = file.read()
-    return (user in passwd)
+    return user in passwd
 
 
 def create_unix_user(login, user_type, name, surname, password):
     """ Generate samba users, homedirs and WWW folder  """
-    if user_type == "student":
+    # 0 = student
+    # 1 = kantor
+    # (psat tam string je fuj a hnuj)
+    if user_type == 0:
         user_group = "505"
         user_homedir = "/user/studenti/" + login
-    elif user_type == "kantor":
+    elif user_type == 1:
         user_group = "555"
         user_homedir = "/user/kantori/" + login
     else:
-        raise "ses vul"
+        raise Exception("ses vul")
+    # ty taky, když raisuješ string a ne exception :)
     fullname = name + " " + surname
 
     # useradd process

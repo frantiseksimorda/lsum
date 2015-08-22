@@ -6,12 +6,13 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
-from evid.models import Student, School_class, User_account_student
+from evid.models import Student, School_class, User_account_student, Email_changes
 from connection import Connection
 from misc import stringList, UnicodeWriter
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
-import csv
+from datetime import datetime, timedelta
+from add_unix_user import is_generated, create_unix_user
 
 
 sync_interval = 20
@@ -64,6 +65,7 @@ def create_user_accounts():
                 login=username,
                 default_passwd=password,
                 email=email,
+                email_to_create=True,
             )
             user_account.save()
 
@@ -84,39 +86,88 @@ def create_user_accounts():
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
-    #TODO vytvorit ucty neexistujici
+    #for i in data:
+    #    if is_generated(i.login):
+    #        continue
+    #    else:
+    #        create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
 
-def create_emails():
-    #TODO TO BE MOVED TO THE DJANGO PART DUE TO THE AUTH WINDOW
+def disable_enable_emails():
 
-    data = list(Student.objects.raw("""
-        SELECT evid_student.id,
-        evid_student.name,
-        evid_student.surname,
-        evid_user_account_student.email,
-        evid_user_account_student.default_passwd
-        FROM evid_student
-        INNER JOIN evid_user_account_student
-        ON evid_student.kod_baka = evid_user_account_student.kod_baka
-    """))
+    data = Student.objects.all()
 
-    with open('temp.csv', 'wb') as csvfile:
-        writer = UnicodeWriter(csvfile, quoting=csv.QUOTE_ALL)
-        writer.writerow(('', 'name', 'surname', 'email', 'password'))
+    for i in data:
+        if i.status != "" and i.status[0] == "-" and i.status != "-PS":
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
+        else:
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=False)
 
-        for i in data:
-            name = unicode(i.name.strip())
-            surname = unicode(i.surname.strip())
-            email = unicode(i.email)
-            password = unicode(i.default_passwd)
+def disable_enable_user_accounts():
+    pass
 
-            print name, surname, email, password
+def schedule_deletion_of_graduated():
+    data = User_account_student.objects.all()
 
-            writer.writerow(('', name, surname, email, password))
+    for i in data:
+        if i.kod_baka not in stringList(Student.objects.values_list("kod_baka")): #todo and is null (aby se to nezapisovalo furt)
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(delete_time=datetime.now() + timedelta(days=365))
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
 
-    os.system("python2 GAM/gam.py csv temp.csv gam create user ~email firstname ~name lastname ~surname password ~password changepassword 1 org test-evid")
 
-    os.remove("temp.csv")
+def delete_graduated():
+    pass
+
+
+def write_email_changes():
+
+    data2 = User_account_student.objects.all()
+
+    for i in data2:
+        if i.email_to_create and not i.email_created:
+            cond = i.email in stringList(Email_changes.objects.values_list("email")) and "create" in stringList(Email_changes.objects.values_list("action").filter(email=i.email))
+            if not cond:
+                data = Student.objects.values_list("name", "surname").filter(kod_baka=i.kod_baka)
+
+                e = Email_changes(user_type=0,
+                                  name=data[0][0],
+                                  surname=data[0][1],
+                                  email=i.email,
+                                  default_passwd=i.default_passwd,
+                                  action="create",
+                                  )
+
+                e.save()
+
+        if i.email_to_disable and not i.email_disabled:
+
+            cond = i.email in stringList(Email_changes.objects.values_list("email")) and "disable" in stringList(Email_changes.objects.values_list("action").filter(email=i.email))
+            if not cond:
+                e = Email_changes(user_type=0,
+                                  email=i.email,
+                                  default_passwd=i.default_passwd,
+                                  action="disable",
+                                  )
+                e.save()
+
+        if not i.email_to_disable and i.email_disabled:
+            cond = i.email in stringList(Email_changes.objects.values_list("email")) and "enable" in stringList(Email_changes.objects.values_list("action").filter(email=i.email))
+            if not cond:
+                e = Email_changes(user_type=0,
+                                  email=i.email,
+                                  default_passwd=i.default_passwd,
+                                  action="enable",
+                                  )
+                e.save()
+
+        if not i.email_to_create and i.email_created:
+            cond = i.email in stringList(Email_changes.objects.values_list("email")) and "delete" in stringList(Email_changes.objects.values_list("action").filter(email=i.email))
+            if not cond:
+                e = Email_changes(user_type=0,
+                                  email=i.email,
+                                  default_passwd=i.default_passwd,
+                                  action="delete",
+                                  )
+                e.save()
 
 
 
@@ -199,20 +250,17 @@ def sync_lsum_db():
         )
 
 
-
-
-
-def update_user_accounts():
-    pass
-
-
 def run():
-    sync_lsum_db()
+    #sync_lsum_db()
     create_user_accounts()
-    update_user_accounts()
+    disable_enable_emails()
+    disable_enable_user_accounts()
+    #schedule_deletion_of_graduated()
+    delete_graduated()
+    write_email_changes()
 
 
-while False:
+while True:
     print "probiha synchronizace, nevypinat skript!"
     timestamp = time()
     run()
@@ -220,8 +268,6 @@ while False:
 
     while timestamp + sync_interval > time():
         pass
-
-create_emails()
 
 
 

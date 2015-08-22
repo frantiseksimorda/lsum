@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from .models import Student
-from django.shortcuts import render
+from .models import Email_changes, User_account_student, Error_log
+from django.shortcuts import render, HttpResponseRedirect
 from .forms import *
-from misc import stringList, activeBrowser
+from misc import stringList, activeBrowser, UnicodeWriter
 from django import forms
+import subprocess
 
 def print_papers_students(request):
 
@@ -254,3 +255,41 @@ def match_rfids_student(request):
                    'scanned': scanned,
                    'message': message,
                    })
+
+def sync_emails(request):
+    data = Email_changes.objects.all()
+
+    for i in data:
+        name = unicode(i.name).strip()
+        surname = unicode(i.surname).strip()
+        email = unicode(i.email)
+        password = unicode(i.default_passwd)
+
+        if i.action == "create":
+            command = "python2 GAM/gam.py create user \""+email+"\" firstname \""+name+"\" lastname \""+surname+"\" password \""+password+"\" changepassword 1 org test-evid"
+        elif i.action == "delete":
+            command = "python2 GAM/gam.py delete user \""+email+"\""
+        elif i.action == "disable":
+            command = "python2 GAM/gam.py update user \""+email+"\" suspended on"
+        elif i.action == "enable":
+            command = "python2 GAM/gam.py update user \""+email+"\" suspended off"
+
+        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+
+        if stderr == "":
+            if i.action == "create":
+                User_account_student.objects.filter(email=i.email).update(email_created=True)
+            elif i.action == "delete":
+                User_account_student.objects.filter(email=i.email).update(email_created=False)
+            elif i.action == "disable":
+                User_account_student.objects.filter(email=i.email).update(email_disabled=True)
+            elif i.action == "enable":
+                User_account_student.objects.filter(email=i.email).update(email_disabled=False)
+        else:
+            e = Error_log(command=command, stderr=stderr)
+            e.save()
+
+        Email_changes.objects.filter(id=i.id).delete()
+
+    return HttpResponseRedirect("/admin/")

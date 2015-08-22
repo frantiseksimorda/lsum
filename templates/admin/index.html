@@ -4,10 +4,22 @@
 {% block content  %}
 
     {{ block.super }}
-
     <form action="match_rfids/">
         <input type="submit" value="Správa čipů">
     </form>
+
+    {% if any_changes %}
+        <span style="color: #ff0000">
+            Synchronizace chce provést změny v e-mailech. <a href="{% url 'sync_emails' %}">Klikněte pro provedení.</a>
+        </span><br>
+    {% endif %}
+
+    {% if error_log_full %}
+        <span style="color: #ff0000">
+            Při synchronizaci e-mailů se vyskytly chyby. Podívejte se do <a href="/admin/evid/error_log">logu.</a>
+        </span><br>
+    {% endif %}
+
 
 {% endblock %}
 
