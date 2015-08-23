@@ -20,7 +20,7 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/print_papers_students/$', 'evid.views.print_papers_students'),
-    url(r'^admin/print_papers_students_all/$', 'evid.views.print_papers_students_all'),
+    url(r'^admin/print_paper_one_student/$', 'evid.views.print_paper_one_student'),
     url(r'^admin/match_rfids/$', 'evid.views.match_rfids'),
     url(r'^admin/match_rfids_all/$', 'evid.views.match_rfids_all'),
     url(r'^admin/match_rfids_one/$', 'evid.views.match_rfids_one'),

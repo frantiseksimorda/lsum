@@ -14,8 +14,15 @@ def print_papers_students(request):
                               SELECT * FROM evid_student
                               INNER JOIN evid_user_account_student
                               ON evid_student.kod_baka = evid_user_account_student.kod_baka
-                              WHERE rfid = ''
-                        """))
+                              WHERE evid_student.school_class_id =
+                              (SELECT id FROM evid_school_class WHERE short_name = 'R1.A')
+                              OR evid_student.school_class_id =
+                              (SELECT id FROM evid_school_class WHERE short_name = '1.A')
+                              OR evid_student.school_class_id =
+                              (SELECT id FROM evid_school_class WHERE short_name = '1.B')
+                              OR evid_student.school_class_id =
+                              (SELECT id FROM evid_school_class WHERE short_name = '1.C')
+                              """))
 
     while divmod(len(data), 40)[1] != 0:
         data.append("")
@@ -25,20 +32,44 @@ def print_papers_students(request):
     return render(request, "print_papers_students.html", {"elements": data, "chrome": chrome})
 
 
-def print_papers_students_all(request):
+def print_paper_one_student(request):
 
-    data = list(Student.objects.raw("""
+    form = SelectPositionOnPaperForm()
+
+    if request.method == "POST":
+
+        selected = True
+
+        if "submit1" in request.POST:
+            form = SelectPositionOnPaperForm(request.POST)
+
+            if form.is_valid():
+                student_id = form.cleaned_data["Select"]
+                pos = int(form.cleaned_data["Select2"])
+
+                data = []
+                for i in range(40):
+                    data.append("")
+
+                data[pos-1] = list(Student.objects.raw("""
                               SELECT * FROM evid_student
                               INNER JOIN evid_user_account_student
                               ON evid_student.kod_baka = evid_user_account_student.kod_baka
-                        """))
+                              WHERE evid_student.id = '"""+str(student_id)+"""'
+                              """))[0]
 
-    while divmod(len(data), 40)[1] != 0:
-        data.append("")
+                chrome = activeBrowser(request) == "chrome"
 
-    chrome = activeBrowser(request) == "chrome"
+                return render(request, "print_papers_students.html", {"elements": data, "chrome": chrome})
 
-    return render(request, "print_papers_students.html", {"elements": data, "chrome": chrome})
+    else:
+        form = SelectPositionOnPaperForm()
+        selected = False
+
+    return render(request, 'print_paper_one_student.html',
+                  {'form': form,
+                   'selected': selected,
+                   })
 
 
 def match_rfids(request):
