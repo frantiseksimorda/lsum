@@ -6,12 +6,14 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
+
 from evid.models import Student, School_class, User_account_student, Email_changes
 from connection import Connection
-from misc import stringList, UnicodeWriter
+from misc import stringList
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
-from datetime import datetime, timedelta
+from datetime import timedelta
+from django.utils import timezone
 from add_unix_user import is_generated, create_unix_user
 
 
@@ -109,13 +111,22 @@ def schedule_deletion_of_graduated():
     data = User_account_student.objects.all()
 
     for i in data:
-        if i.kod_baka not in stringList(Student.objects.values_list("kod_baka")): #todo and is null (aby se to nezapisovalo furt)
-            User_account_student.objects.filter(kod_baka=i.kod_baka).update(delete_time=datetime.now() + timedelta(days=365))
+        if i.kod_baka not in stringList(Student.objects.values_list("kod_baka")) and i.delete_time is None:
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(delete_time=timezone.now() + timedelta(days=365))
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
 
 
 def delete_graduated():
-    pass
+    data = User_account_student.objects.all()
+
+    for i in data:
+        if i.delete_time is None:
+            continue
+
+        if i.delete_time < timezone.now():
+            User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_create=False)
+            # smazat účet na školních PC
+            # smazat ze safeQ atd atd
 
 
 def write_email_changes():
@@ -255,7 +266,7 @@ def run():
     create_user_accounts()
     disable_enable_emails()
     disable_enable_user_accounts()
-    #schedule_deletion_of_graduated()
+    schedule_deletion_of_graduated()
     delete_graduated()
     write_email_changes()
 
