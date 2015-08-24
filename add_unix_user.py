@@ -47,11 +47,16 @@ def create_unix_user(login, user_type, name, surname, password):
     chown_www_proc = Popen(["chown", login + ":nobody", user_homedir + "/WWW"], stdout=PIPE, stderr=PIPE)
     stdout3, stderr3 = chown_www_proc.communicate()
 
+    # chmod on homedir
+    chmod_homedir_proc = Popen(["chmod", "711", "-R", user_homedir], stdout=PIPE, stderr=PIPE)
+    stdout4, stderr4 = chmod_homedir_proc.communicate()
+
     # fix owner and group of WWW dir
     chmod_www_proc = Popen(["chmod", "750", user_homedir + "/WWW"], stdout=PIPE, stderr=PIPE)
-    stdout4, stderr4 = chmod_www_proc.communicate()
+    stdout5, stderr5 = chmod_www_proc.communicate()
 
-    return (stdout, stderr, stdout1, stderr1, stdout2, stderr2, stdout3, stderr3, stdout4, stderr4)
+    return (stdout, stderr, stdout1, stderr1, stdout2, stderr2, stdout3, stderr3, stdout4, stderr4, stdout5, stderr5)
+
 
 def disable_unix_account(login):
     """ smbpasswd -d user - disable Windows login to domain """
@@ -70,7 +75,7 @@ def remove_unix_account(login):
     """ remove user from system and homedir """
     smbRemoveUser = Popen(["smbpasswd", "-x", login], stdout=PIPE, stderr=PIPE)
     stdouts, stderrs = smbRemoveUser.communicate()
-    removeUser = Popen(["userdell",  "-r", login], stdout=PIPE, stderr=PIPE)
+    removeUser = Popen(["userdel",  "-r", login], stdout=PIPE, stderr=PIPE)
     stdout, stderr = removeUser.communicate()
     return (stdout,stderr,stdouts,stderrs)
 
