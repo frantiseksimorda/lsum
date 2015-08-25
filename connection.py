@@ -75,7 +75,7 @@ class Connection:
 
         # connects to the desired connection
         if connection_data["type"] == "MSSQL":
-            connection = pymssql.connect(
+            self.connection = pymssql.connect(
                 host=connection_data["ip"] + connection_data["port"],
                 user=connection_data["user"],
                 password=connection_data["password"],
@@ -84,7 +84,7 @@ class Connection:
             )
 
         elif connection_data["type"] == "PostgreSQL":
-            connection = psycopg2.connect(
+            self.connection = psycopg2.connect(
                 host=connection_data["ip"],
                 port=connection_data["port"],
                 user=connection_data["user"],
@@ -94,7 +94,7 @@ class Connection:
             )
 
         # prepares the cursor
-        self.cursor = connection.cursor()
+        self.cursor = self.connection.cursor()
 
     def execute(self, query, protected=True):
 
@@ -106,13 +106,15 @@ class Connection:
            "CREATE " not in query.upper() and \
            ";" not in query:
                 self.cursor.execute(query)
+                self.connection.commit()
         else:
             if protected:
                 raise Exception("YOU SHALL NOT PASS!!!")
             else:
                 self.cursor.execute(query)
+                self.connection.commit()
         try:
             return self.cursor.fetchall()
         except:
-            print "Query executed successfully."
+            pass
 

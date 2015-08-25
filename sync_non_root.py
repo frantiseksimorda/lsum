@@ -8,13 +8,12 @@ import django
 django.setup()
 
 from evid.models import Student, School_class, User_account_student, Email_changes
-from connection import Connection
 from misc import stringList
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
 from datetime import timedelta
 from django.utils import timezone
-from add_unix_user import is_generated, create_unix_user
+from add_unix_user import *
 
 
 sync_interval = 20
@@ -81,18 +80,39 @@ def create_user_accounts():
         SELECT evid_student.id,
         evid_student.name,
         evid_student.surname,
+        evid_student.rfid,
         evid_user_account_student.login,
-        evid_user_account_student.default_passwd
+        evid_user_account_student.default_passwd,
+        evid_user_account_student.email
         FROM evid_student
         INNER JOIN evid_user_account_student
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
     #for i in data:
-    #    if is_generated(i.login):
-    #        continue
-    #    else:
+    #    if not is_generated(i.login):
     #        create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
+
+    for i in data:
+        if not safeq_is_generated(i.login):
+            safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+
+def update_user_accounts():
+    data = list(Student.objects.raw("""
+        SELECT evid_student.id,
+        evid_student.name,
+        evid_student.surname,
+        evid_student.rfid,
+        evid_user_account_student.login,
+        evid_user_account_student.default_passwd,
+        evid_user_account_student.email
+        FROM evid_student
+        INNER JOIN evid_user_account_student
+        ON evid_student.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    for i in data:
+        safeq_update_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
 
 def disable_enable_emails():
 
@@ -126,7 +146,7 @@ def delete_graduated():
         if i.delete_time < timezone.now():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_create=False)
             # smazat účet na školních PC
-            # smazat ze safeQ atd atd
+            safeq_delete_user(i.login)
 
 
 def write_email_changes():
@@ -263,7 +283,6 @@ def sync_lsum_db():
 
 def run():
     #sync_lsum_db()
-    create_user_accounts()
     disable_enable_emails()
     disable_enable_user_accounts()
     schedule_deletion_of_graduated()
@@ -272,7 +291,7 @@ def run():
 
 
 while True:
-    print "probiha synchronizace, nevypinat skript!"
+    print "probiha non root synchronizace, nevypinat skript!"
     timestamp = time()
     run()
     print "synchronizace provedena "+str(asctime())

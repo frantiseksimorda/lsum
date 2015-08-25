@@ -5,6 +5,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 from subprocess import Popen, PIPE
+import psycopg2
+from connection import Connection
+
+connKopirky = Connection("kopirky")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
@@ -82,4 +86,56 @@ def remove_unix_account(login):
 def cahange_unxi_password():
     """ smbpasswd -a user - change password """
     pass
+
+
+def safeq_create_user(login, user_type, name, surname, email, password, rfid):
+
+    if user_type == 1:
+        stredisko = 1
+    elif user_type == 0:
+        stredisko = 2
+    else:
+        stredisko = 2
+
+    query = "INSERT INTO users (login,pass,name,surname,sign,email,flag,ip,ou_id,ext_id,login_ascii,name_ascii,surname_ascii,replicated,safeq_oid,card_num,homedir,ext_name) VALUES ('%s', '%s', '%s', '%s', NULL, '%s', 1, NULL, %s, NULL, '%s', '%s', '%s', 0, NULL, NULL, NULL, NULL);" % (login, password, name, surname, email, stredisko, login, name, surname)
+    connKopirky.execute(query, protected=False)
+
+    user_id = connKopirky.execute("SELECT id FROM users WHERE login = '"+login+"'")[0][0]
+
+    query = "INSERT INTO users_cards (user_id,card,dual_pin,replicated_card,replicated_card_from,replicated_card_flag,pin_expiration_date) VALUES (%s,'%s',NULL,0,NULL,0,NULL);" % (user_id, rfid)
+    connKopirky.execute(query, protected=False)
+
+def safeq_delete_user(login):
+
+    user_id = connKopirky.execute("SELECT id FROM users WHERE login = '"+login+"'")[0][0]
+
+    query = "DELETE FROM users WHERE login = '"+login+"'"
+    connKopirky.execute(query, protected=False)
+
+    query = "DELETE FROM users_cards WHERE user_id = "+str(user_id)
+    connKopirky.execute(query, protected=False)
+
+def safeq_is_generated(login):
+    try:
+        line = connKopirky.execute("SELECT login FROM users WHERE login = '"+login+"'")[0][0]
+        return True
+    except:
+        return False
+
+def safeq_update_user(login, user_type, name, surname, email, password, rfid):
+    if user_type == 1:
+        stredisko = 1
+    elif user_type == 0:
+        stredisko = 2
+    else:
+        stredisko = 2
+
+    query = "UPDATE users SET (login,pass,name,surname,email,ou_id,login_ascii,name_ascii,surname_ascii) = ('%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s');" % (login, password, name, surname, email, stredisko, login, name, surname)
+    connKopirky.execute(query, protected=False)
+
+    user_id = connKopirky.execute("SELECT id FROM users WHERE login = '"+login+"'")[0][0]
+
+    query = "UPDATE users_cards SET (card) = (%s);" % (rfid,)
+    connKopirky.execute(query, protected=False)
+
 
