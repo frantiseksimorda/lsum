@@ -89,10 +89,6 @@ def create_user_accounts():
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
-    #for i in data:
-    #    if not is_generated(i.login):
-    #        create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
-
     for i in data:
         if not safeq_is_generated(i.login):
             safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
@@ -145,7 +141,6 @@ def delete_graduated():
 
         if i.delete_time < timezone.now():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_create=False)
-            # smazat účet na školních PC
             safeq_delete_user(i.login)
 
 
@@ -283,6 +278,7 @@ def sync_lsum_db():
 
 def run():
     #sync_lsum_db()
+    create_user_accounts()
     disable_enable_emails()
     disable_enable_user_accounts()
     schedule_deletion_of_graduated()
