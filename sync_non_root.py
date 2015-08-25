@@ -16,7 +16,7 @@ from django.utils import timezone
 from add_unix_user import *
 
 
-sync_interval = 20
+sync_interval = 200
 
 
 
@@ -279,6 +279,7 @@ def sync_lsum_db():
 def run():
     sync_lsum_db()
     create_user_accounts()
+    update_user_accounts()
     disable_enable_emails()
     disable_enable_user_accounts()
     schedule_deletion_of_graduated()
@@ -287,10 +288,10 @@ def run():
 
 
 while True:
-    print "probiha non root synchronizace, nevypinat skript!"
+    print("probiha non root synchronizace, nevypinat skript!")
     timestamp = time()
     run()
-    print "synchronizace provedena "+str(asctime())
+    print("synchronizace provedena "+str(asctime()))
 
     while timestamp + sync_interval > time():
         pass
