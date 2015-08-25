@@ -277,7 +277,7 @@ def sync_lsum_db():
 
 
 def run():
-    #sync_lsum_db()
+    sync_lsum_db()
     create_user_accounts()
     disable_enable_emails()
     disable_enable_user_accounts()

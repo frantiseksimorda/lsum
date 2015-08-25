@@ -2,6 +2,7 @@
 
 import pymssql
 import psycopg2
+import fdb
 
 __author__ = "karlosss"
 
@@ -93,10 +94,23 @@ class Connection:
                 client_encoding=connection_data["charset"],
             )
 
+        elif connection_data["type"] == "Firebird":
+            self.connection = fdb.connect(
+                host=connection_data["ip"],
+                database=connection_data["database"],
+                user=connection_data["user"],
+                password=connection_data["password"],
+                port=connection_data["port"]
+            )
+
         # prepares the cursor
         self.cursor = self.connection.cursor()
+        self.type = connection_data["type"]
 
     def execute(self, query, protected=True):
+        if self.type == "Firebird":
+            self.cursor.execute("execute procedure relog_user(1)")
+            self.connection.commit()
 
         # escape the following statements in queries if protected
         if "INSERT " not in query.upper() and \
@@ -106,13 +120,16 @@ class Connection:
            "CREATE " not in query.upper() and \
            ";" not in query:
                 self.cursor.execute(query)
-                self.connection.commit()
+                if "SELECT " not in query.upper():
+                    self.connection.commit()
+
         else:
             if protected:
                 raise Exception("YOU SHALL NOT PASS!!!")
             else:
                 self.cursor.execute(query)
-                self.connection.commit()
+                if "SELECT " not in query.upper():
+                    self.connection.commit()
         try:
             return self.cursor.fetchall()
         except:
