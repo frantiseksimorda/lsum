@@ -9,6 +9,7 @@ Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
 - Clone the repository (via `git clone https://github.com/frantiseksimorda/lsum`)
 - Execute `pip2 install argument`, replacing the `argument` with the following:
   -  `pymssql`
+  -  `fdb`
   -  `python2-psycopg2`
   -  `django-import-export`
   -  `django-overextends`
