@@ -11,7 +11,7 @@ from datetime import timedelta
 from django.utils import timezone
 from add_unix_user import *
 
-sync_interval = 20
+sync_interval = 200
 
 def create_user_accounts():
 

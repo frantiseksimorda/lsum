@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^admin/match_rfids_one/$', 'evid.views.match_rfids_one'),
     url(r'^admin/match_rfids_student/$', 'evid.views.match_rfids_student'),
     url(r'^sync_emails/$', 'evid.views.sync_emails', name="sync_emails"),
+    url(r'^skip_student/$', 'evid.views.skip_student', name="skip_student"),
 ]

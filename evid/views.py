@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from .models import Email_changes, User_account_student, Error_log
+from .models import Email_changes, User_account_student, Error_log, Student
 from django.shortcuts import render, HttpResponseRedirect
 from .forms import *
 from misc import stringList, activeBrowser, UnicodeWriter
@@ -103,7 +103,7 @@ def match_rfids_all(request):
                    'message_color': message_color,
                    })
 
-    active_student = Student.objects.filter(rfid="")[0]
+    active_student = Student.objects.filter(rfid="", to_be_skipped=False)[0]
 
     if form.is_valid():
         chip = form.cleaned_data["Chip"]
@@ -123,7 +123,7 @@ def match_rfids_all(request):
                    'message_color': message_color,
                    })
 
-            active_student = Student.objects.filter(rfid="")[0]
+            active_student = Student.objects.filter(rfid="", to_be_skipped=False)[0]
 
             message_color = "#008800"
         else:
@@ -324,3 +324,13 @@ def sync_emails(request):
         Email_changes.objects.filter(id=i.id).delete()
 
     return HttpResponseRedirect("/admin/")
+
+def skip_student(request):
+    active_student = Student.objects.filter(rfid="", to_be_skipped=False)[0]
+    Student.objects.filter(id=active_student.id).update(to_be_skipped=True)
+
+    if False not in stringList(Student.objects.filter(rfid="", to_be_skipped=False).values_list("to_be_skipped")):
+        Student.objects.filter(rfid="").update(to_be_skipped=False)
+
+    return HttpResponseRedirect("/admin/match_rfids_all/")
+

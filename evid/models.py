@@ -59,6 +59,7 @@ class Student(models.Model):
     school_class = models.ForeignKey(School_class)
     rfid = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=10, null=True)
+    to_be_skipped = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """ Custumize  save process """

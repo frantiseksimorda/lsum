@@ -9,6 +9,7 @@ import psycopg2
 from connection import Connection
 
 connKopirky = Connection("kopirky")
+connKnihovna = Connection("knihovna")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
@@ -122,20 +123,15 @@ def safeq_is_generated(login):
     except:
         return False
 
-def safeq_update_user(login, user_type, name, surname, email, password, rfid):
-    if user_type == 1:
-        stredisko = 1
-    elif user_type == 0:
-        stredisko = 2
-    else:
-        stredisko = 2
-
-    query = "UPDATE users SET (login,pass,name,surname,email,ou_id,login_ascii,name_ascii,surname_ascii) = ('%s', '%s', '%s', '%s', '%s', %s, '%s', '%s', '%s');" % (login, password, name, surname, email, stredisko, login, name, surname)
-    connKopirky.execute(query, protected=False)
+def safeq_update_user(login, rfid):
 
     user_id = connKopirky.execute("SELECT id FROM users WHERE login = '"+login+"'")[0][0]
 
-    query = "UPDATE users_cards SET (card) = (%s);" % (rfid,)
+    query = "UPDATE users_cards SET card = '"+rfid+"' WHERE user_id = "+str(user_id)
     connKopirky.execute(query, protected=False)
 
+def knihovna_update_user(kod_baka, rfid):
+
+    query = "UPDATE ctenari SET bar_cod = '"+rfid+"' WHERE bakalari = '"+kod_baka+"'"
+    connKnihovna.execute(query, protected=False)
 

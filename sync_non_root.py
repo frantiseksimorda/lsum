@@ -16,7 +16,8 @@ from django.utils import timezone
 from add_unix_user import *
 
 
-sync_interval = 20
+sync_interval = 200
+connBaka = Connection("bakalari")
 
 
 
@@ -24,7 +25,6 @@ def get_class_id(class_name):
     return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
 
 def fetch_data():
-    connBaka = Connection("bakalari")
 
     priznaky = connBaka.execute("SELECT intern_kod, druh, datum FROM histzaku ORDER BY datum DESC ")
     studenti = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, pohlavi, trida FROM zaci ORDER BY intern_kod")
@@ -51,6 +51,9 @@ def fetch_data():
                     studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], j[1]))
 
     return (studenti_parsed, school_classes_parsed)
+
+def fetch_data_teachers():
+    pass
 
 def create_user_accounts():
 
@@ -96,19 +99,16 @@ def create_user_accounts():
 def update_user_accounts():
     data = list(Student.objects.raw("""
         SELECT evid_student.id,
-        evid_student.name,
-        evid_student.surname,
         evid_student.rfid,
-        evid_user_account_student.login,
-        evid_user_account_student.default_passwd,
-        evid_user_account_student.email
+        evid_user_account_student.login
         FROM evid_student
         INNER JOIN evid_user_account_student
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
     for i in data:
-        safeq_update_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+        safeq_update_user(i.login, i.rfid)
+        knihovna_update_user(i.kod_baka, i.rfid)
 
 def disable_enable_emails():
 
@@ -119,9 +119,6 @@ def disable_enable_emails():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
         else:
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=False)
-
-def disable_enable_user_accounts():
-    pass
 
 def schedule_deletion_of_graduated():
     data = User_account_student.objects.all()
@@ -142,6 +139,8 @@ def delete_graduated():
         if i.delete_time < timezone.now():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_create=False)
             safeq_delete_user(i.login)
+            if not i.email_created:
+                User_account_student.objects.filter(kod_baka=i.kod_baka).delete()
 
 
 def write_email_changes():
@@ -279,8 +278,8 @@ def sync_lsum_db():
 def run():
     sync_lsum_db()
     create_user_accounts()
+    update_user_accounts()
     disable_enable_emails()
-    disable_enable_user_accounts()
     schedule_deletion_of_graduated()
     delete_graduated()
     write_email_changes()
