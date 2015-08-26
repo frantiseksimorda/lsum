@@ -11,7 +11,7 @@ class Student_admin(admin.ModelAdmin):
 
 
 class Teacher_admin(admin.ModelAdmin):
-    list_display = ("surname", "name")
+    list_display = ("surname", "name","active","rfid")
 
 
 class School_class_admin(admin.ModelAdmin):

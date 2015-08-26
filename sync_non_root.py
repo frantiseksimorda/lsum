@@ -7,7 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 
-from evid.models import Student, School_class, User_account_student, Email_changes
+from evid.models import Student, School_class, User_account_student, Email_changes, Teacher
 from misc import stringList
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
@@ -53,7 +53,8 @@ def fetch_data():
     return (studenti_parsed, school_classes_parsed)
 
 def fetch_data_teachers():
-    pass
+    ucitele = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, deleted_rc FROM ucitele ORDER BY intern_kod")
+    return ucitele
 
 def create_user_accounts():
 
@@ -274,15 +275,65 @@ def sync_lsum_db():
             status=i[5],
         )
 
+    teachers_to_delete = []
+    teachers_to_write = []
+    teachers_to_update = []
+
+    actual_teachers = fetch_data_teachers()
+    written_teachers = stringList(Teacher.objects.values_list("kod_baka"))
+
+    for i in written_teachers:
+        if i not in stringList(actual_teachers):
+            teachers_to_delete.append(i)
+
+    for i in actual_teachers:
+        if i[0] not in written_teachers:
+            teachers_to_write.append(i)
+        else:
+            teachers_to_update.append(i)
+
+    for i in teachers_to_delete:
+        Teacher.objects.filter(kod_baka=i).delete()
+
+    for i in teachers_to_write:
+        t = Teacher(
+            name=i[1],
+            surname=i[2],
+            kod_baka=i[0],
+            active=not(i[3]),
+            rfid="",
+        )
+        t.save()
+
+    # existing students
+    for i in teachers_to_update:
+        Teacher.objects.filter(kod_baka=i[0]).update(
+            name=i[1],
+            surname=i[2],
+            active=not(i[3]),
+            rfid="",
+        )
+
+
+
+
+
+
+
+
+
+
+
+
 
 def run():
     sync_lsum_db()
-    create_user_accounts()
-    update_user_accounts()
-    disable_enable_emails()
-    schedule_deletion_of_graduated()
-    delete_graduated()
-    write_email_changes()
+    #create_user_accounts()
+    #update_user_accounts()
+    #disable_enable_emails()
+    #schedule_deletion_of_graduated()
+    #delete_graduated()
+    #write_email_changes()
 
 
 while True:
