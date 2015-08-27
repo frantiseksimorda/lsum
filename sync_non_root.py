@@ -108,8 +108,9 @@ def update_user_accounts():
     """))
 
     for i in data:
-        safeq_update_user(i.login, i.rfid)
-        knihovna_update_user(i.kod_baka, i.rfid)
+        if i.rfid != "":
+            safeq_update_user(i.login, i.rfid)
+            knihovna_update_user(i.kod_baka, i.rfid)
 
 def disable_enable_emails():
 

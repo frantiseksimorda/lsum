@@ -297,7 +297,7 @@ def sync_emails(request):
         password = unicode(i.default_passwd)
 
         if i.action == "create":
-            command = "python2 GAM/gam.py create user \""+email+"\" firstname \""+name+"\" lastname \""+surname+"\" password \""+password+"\" changepassword 1 org test-evid"
+            command = "python2 GAM/gam.py create user \""+email+"\" firstname \""+name+"\" lastname \""+surname+"\" password \""+password+"\" changepassword 1 org studenti"
         elif i.action == "delete":
             command = "python2 GAM/gam.py delete user \""+email+"\""
         elif i.action == "disable":
