@@ -36,14 +36,9 @@ class Teacher(models.Model):
     """ Kantori """
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
-    login = models.CharField(null=True,max_length=20)
-    default_passwd = models.CharField(max_length=50,null=True)
-    sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     kod_baka = models.CharField(max_length=20) # blank=True ???ANO/NE???
-    add_date = models.DateTimeField(auto_now_add=True)
-    chip = models.CharField(null=True,max_length=20)
-    email = models.EmailField(null=True)
-    active = models.BooleanField()
+    rfid = models.CharField(null=True,max_length=20)
+    active = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.name
@@ -59,6 +54,7 @@ class Student(models.Model):
     school_class = models.ForeignKey(School_class)
     rfid = models.CharField(max_length=20, null=True)
     status = models.CharField(max_length=10, null=True)
+    to_be_skipped = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         """ Custumize  save process """

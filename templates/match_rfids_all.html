@@ -18,6 +18,7 @@
 
             <p>Načtěte čip pro studenta:</p>
             <p><b>{{ active_student.name }}{{ active_student.surname }}({{ active_student.school_class }}), {{ active_student.kod_baka }}</b></p>
+            <a href="{% url 'skip_student' %}">Přeskočit studenta</a>
 
             <form action="/admin/match_rfids_all/" method="post">
                 {% csrf_token %}

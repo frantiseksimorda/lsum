@@ -7,7 +7,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 
-from evid.models import Student, School_class, User_account_student, Email_changes
+from evid.models import Student, School_class, User_account_student, Email_changes, Teacher
 from misc import stringList
 from time import time, asctime
 from login_generator import generate_login, generate_password, generate_email
@@ -17,6 +17,8 @@ from add_unix_user import *
 
 
 sync_interval = 200
+connBaka = Connection("bakalari")
+
 
 
 
@@ -24,7 +26,6 @@ def get_class_id(class_name):
     return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
 
 def fetch_data():
-    connBaka = Connection("bakalari")
 
     priznaky = connBaka.execute("SELECT intern_kod, druh, datum FROM histzaku ORDER BY datum DESC ")
     studenti = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, pohlavi, trida FROM zaci ORDER BY intern_kod")
@@ -51,6 +52,10 @@ def fetch_data():
                     studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], j[1]))
 
     return (studenti_parsed, school_classes_parsed)
+
+def fetch_data_teachers():
+    ucitele = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, deleted_rc FROM ucitele ORDER BY intern_kod")
+    return ucitele
 
 def create_user_accounts():
 
@@ -96,19 +101,17 @@ def create_user_accounts():
 def update_user_accounts():
     data = list(Student.objects.raw("""
         SELECT evid_student.id,
-        evid_student.name,
-        evid_student.surname,
         evid_student.rfid,
-        evid_user_account_student.login,
-        evid_user_account_student.default_passwd,
-        evid_user_account_student.email
+        evid_user_account_student.login
         FROM evid_student
         INNER JOIN evid_user_account_student
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
     """))
 
     for i in data:
-        safeq_update_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+        if i.rfid != "":
+            safeq_update_user(i.login, i.rfid)
+            knihovna_update_user(i.kod_baka, i.rfid)
 
 def disable_enable_emails():
 
@@ -119,9 +122,6 @@ def disable_enable_emails():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
         else:
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=False)
-
-def disable_enable_user_accounts():
-    pass
 
 def schedule_deletion_of_graduated():
     data = User_account_student.objects.all()
@@ -142,6 +142,8 @@ def delete_graduated():
         if i.delete_time < timezone.now():
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_create=False)
             safeq_delete_user(i.login)
+            if not i.email_created:
+                User_account_student.objects.filter(kod_baka=i.kod_baka).delete()
 
 
 def write_email_changes():
@@ -275,9 +277,60 @@ def sync_lsum_db():
             status=i[5],
         )
 
+    teachers_to_delete = []
+    teachers_to_write = []
+    teachers_to_update = []
+
+    actual_teachers = fetch_data_teachers()
+    written_teachers = stringList(Teacher.objects.values_list("kod_baka"))
+
+    for i in written_teachers:
+        if i not in stringList(actual_teachers):
+            teachers_to_delete.append(i)
+
+    for i in actual_teachers:
+        if i[0] not in written_teachers:
+            teachers_to_write.append(i)
+        else:
+            teachers_to_update.append(i)
+
+    for i in teachers_to_delete:
+        Teacher.objects.filter(kod_baka=i).delete()
+
+    for i in teachers_to_write:
+        t = Teacher(
+            name=i[1],
+            surname=i[2],
+            kod_baka=i[0],
+            active=not(i[3]),
+            rfid="",
+        )
+        t.save()
+
+    # existing students
+    for i in teachers_to_update:
+        Teacher.objects.filter(kod_baka=i[0]).update(
+            name=i[1],
+            surname=i[2],
+            active=not(i[3]),
+            rfid="",
+        )
+
+
+
+
+
+
+
+
+
+
+
+
 
 def run():
     sync_lsum_db()
+<<<<<<< HEAD
     create_user_accounts()
     update_user_accounts()
     disable_enable_emails()
@@ -285,6 +338,14 @@ def run():
     schedule_deletion_of_graduated()
     delete_graduated()
     write_email_changes()
+=======
+    #create_user_accounts()
+    #update_user_accounts()
+    #disable_enable_emails()
+    #schedule_deletion_of_graduated()
+    #delete_graduated()
+    #write_email_changes()
+>>>>>>> e1e3686b9f84b9b437b56d9902c5fa1f3032d5d5
 
 
 while True:
