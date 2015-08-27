@@ -5,7 +5,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 from subprocess import Popen, PIPE
-import psycopg2
 from connection import Connection
 
 connKopirky = Connection("kopirky")
@@ -134,4 +133,17 @@ def knihovna_update_user(kod_baka, rfid):
 
     query = "UPDATE ctenari SET bar_cod = '"+rfid+"' WHERE bakalari = '"+kod_baka+"'"
     connKnihovna.execute(query, protected=False)
+
+def get_unix_users():
+    file = open("/etc/passwd", "r")
+    content = file.readlines()
+
+    user_list = []
+
+    for i in content:
+        user_list.append(i.split(":")[0])
+
+    return user_list
+
+get_unix_users()
 

@@ -35,7 +35,7 @@ def update_user_accounts():
     pass
 
 def delete_user_accounts():
-    for i in get_users():
+    for i in get_unix_users():
         if i not in stringList(User_account_student.objects.values_list("login")):
             remove_unix_account(i)
 
