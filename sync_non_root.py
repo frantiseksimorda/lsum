@@ -329,12 +329,12 @@ def sync_lsum_db():
 
 def run():
     sync_lsum_db()
-    #create_user_accounts()
-    #update_user_accounts()
-    #disable_enable_emails()
-    #schedule_deletion_of_graduated()
-    #delete_graduated()
-    #write_email_changes()
+    create_user_accounts()
+    update_user_accounts()
+    disable_enable_emails()
+    schedule_deletion_of_graduated()
+    delete_graduated()
+    write_email_changes()
 
 
 while True:

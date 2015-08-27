@@ -91,7 +91,7 @@ class Connection:
                 user=connection_data["user"],
                 password=connection_data["password"],
                 dbname=connection_data["database"],
-                client_encoding=connection_data["charset"],
+                #client_encoding=connection_data["charset"],
             )
 
         elif connection_data["type"] == "Firebird":
