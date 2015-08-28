@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lsum.settings")
 import django
 django.setup()
 from subprocess import Popen, PIPE
 from connection import Connection
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 connKopirky = Connection("kopirky")
 connKnihovna = Connection("knihovna")
