@@ -6,7 +6,7 @@ from misc import stringList
 
 class Student_resource(resources.ModelResource):
     class Meta:
-        model = User_account_student
+        model = Student
         fields = ('kod_baka', 'name', 'surname', 'school_class')
 
 class Student_admin(ImportExportActionModelAdmin):
