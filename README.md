@@ -15,7 +15,7 @@ Sprava unix useru a Sync s Bakaláři, SafeQ a Vstupní systém
   -  `django-overextends`
   -  `user-agents`
   -  `--upgrade google-api-python-client`
-  (pymssql requires mysql-devel ; psycopg2 requires postgreslq-devel - packages names on CentOS)
+  (pymssql requires mysql-devel ; psycopg2 requires postgreslq-devel - packages names on CentOS)}
 - Replace your `python27/site-packages/overextends/templatetags/overextends_tags.py` with [this file](https://github.com/stephenmcd/django-overextends/blob/master/overextends/templatetags/overextends_tags.py)
 - Go to [Google Developers Console](https://console.developers.google.com/):
   -  Create a new project

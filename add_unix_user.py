@@ -8,8 +8,8 @@ from subprocess import Popen, PIPE
 import psycopg2
 from connection import Connection
 
-connKopirky = Connection("kopirky")
-connKnihovna = Connection("knihovna")
+#connKopirky = Connection("kopirky")
+#connKnihovna = Connection("knihovna")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
