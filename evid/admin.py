@@ -4,16 +4,16 @@ from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from misc import stringList
 
+class Student_resource(resources.ModelResource):
+    class Meta:
+        model = User_account_student
+        fields = ('kod_baka', 'name', 'surname', 'school_class')
+
 class Student_admin(ImportExportActionModelAdmin):
     list_display = ("id", "surname", "name", "school_class", "rfid", "status")
     list_display_links = ("surname", )
     search_fields = ("surname", )
     resource_class = Student_resource
-
-class Student_resource(resources.ModelResource):
-    class Meta:
-        model = User_account_student
-        fields = ('kod_baka', 'name', 'surname', 'school_class')
 
 
 class Teacher_admin(admin.ModelAdmin):
