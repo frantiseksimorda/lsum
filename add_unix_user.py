@@ -11,8 +11,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-connKopirky = Connection("kopirky")
-connKnihovna = Connection("knihovna")
+#connKopirky = Connection("kopirky")
+#connKnihovna = Connection("knihovna")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
@@ -35,6 +35,10 @@ def create_unix_user(login, user_type, name, surname, password):
     else:
         raise Exception("ses vul")
     # ty taky, když raisuješ string a ne exception :)
+    
+    name = name.strip()
+    surname = surname.strip()
+
     fullname = name + " " + surname
 
     # useradd process
@@ -44,7 +48,7 @@ def create_unix_user(login, user_type, name, surname, password):
 
     # password sett process
     # smbpasswd_proc = Popen(["printf \"%s\n%s\n\"" + password + " " + password + "| /usr/bin/smbpasswd ", "-s", "-a", login,], stdout=PIPE, stderr=PIPE)
-    smbpasswd_proc = Popen(["printf \"%s\n%s\n\" \"" + password + "\" \"" + password + "\" | /usr/bin/smbpasswd -a " + login], stdout=PIPE, stderr=PIPE, shell=True)
+    smbpasswd_proc = Popen(["printf \"%s\n%s\n\" \"" + password + "\" \"" + password + "\" | /usr/bin/smbpasswd -a -s " + login], stdout=PIPE, stderr=PIPE, shell=True)
     stdout1, stderr1 = smbpasswd_proc.communicate()
 
     # create WWW dir and correct rights

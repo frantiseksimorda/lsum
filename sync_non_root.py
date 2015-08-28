@@ -32,6 +32,7 @@ def convert_date(x):
     return x[2]+"-"+x[1]+"-"+x[0]
 
 
+
 def get_class_id(class_name):
     return School_class.objects.values_list("id").filter(short_name=class_name)[0][0]
 
@@ -354,10 +355,10 @@ def run():
 
 
 while True:
-    print "probiha non root synchronizace, nevypinat skript!"
+    print("probiha non root synchronizace, nevypinat skript!")
     timestamp = time()
     run()
-    print "synchronizace provedena "+str(asctime())
+    print("synchronizace provedena "+str(asctime()))
 
     while timestamp + sync_interval > time():
         pass
