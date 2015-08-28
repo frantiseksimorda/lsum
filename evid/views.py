@@ -326,7 +326,12 @@ def sync_emails(request):
     return HttpResponseRedirect("/admin/")
 
 def skip_student(request):
-    active_student = Student.objects.filter(rfid="", to_be_skipped=False)[0]
+    try:
+        active_student = Student.objects.filter(rfid="", to_be_skipped=False)[0]
+    except:
+        Student.objects.filter(rfid="").update(to_be_skipped=False)
+        return HttpResponseRedirect("/admin/match_rfids_all/")
+
     Student.objects.filter(id=active_student.id).update(to_be_skipped=True)
 
     if False not in stringList(Student.objects.filter(rfid="", to_be_skipped=False).values_list("to_be_skipped")):

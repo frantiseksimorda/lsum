@@ -102,3 +102,6 @@ class Error_log(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     command = models.CharField(max_length=1000)
     stderr = models.CharField(max_length=1000)
+
+class Lsum_account(models.Model):
+    login = models.CharField(max_length=20)

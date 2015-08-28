@@ -333,7 +333,6 @@ def run():
     create_user_accounts()
     update_user_accounts()
     disable_enable_emails()
-    disable_enable_user_accounts() 
     schedule_deletion_of_graduated()
     delete_graduated()
     write_email_changes()

@@ -2,10 +2,13 @@
 
 from django import forms
 from django.core.validators import RegexValidator
-from .models import Student
+from .models import Student, Teacher
 
 STUDENTS = tuple((item.id, item.surname+" "+item.name+" ("+str(item.school_class)+"), "+item.kod_baka)
                  for item in Student.objects.all().order_by("surname"))
+
+TEACHERS = tuple((item.id, item.surname+" "+item.name+" (učitel), "+item.kod_baka)
+                 for item in Teacher.objects.all().order_by("surname"))
 
 POSITIONS = tuple((i, str(i)) for i in range(1, 41, 1))
 
@@ -31,6 +34,23 @@ class RfidAssignToAnotherOwnerForm(forms.Form):
     Chip = forms.CharField(label="")
 
     Select = forms.CharField(widget=forms.Select(choices=STUDENTS),
+                             label="",
+                             required=False,
+                             )
+
+class RfidAssignToAnotherTeacherForm(forms.Form): #TODO implement
+
+    def __init__(self, *args, **kwargs):
+        super(RfidAssignToAnotherTeacherForm, self).__init__(*args, **kwargs)
+        self.fields['Select'] = forms.CharField(widget=forms.Select(choices=tuple((item.id, item.surname+" "+item.name+" (učitel), "+item.kod_baka)
+                 for item in Teacher.objects.all().order_by("surname"))),
+                             label="",
+                             required=False,
+                             )
+
+    Chip = forms.CharField(label="")
+
+    Select = forms.CharField(widget=forms.Select(choices=TEACHERS),
                              label="",
                              required=False,
                              )
