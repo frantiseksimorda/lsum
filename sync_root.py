@@ -48,7 +48,7 @@ def run():
 
 
 while True:
-    print "probiha non root synchronizace, nevypinat skript!"
+    print "probiha root synchronizace, nevypinat skript!"
     timestamp = time()
     run()
     print "synchronizace provedena "+str(asctime())
