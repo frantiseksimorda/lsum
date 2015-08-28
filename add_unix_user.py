@@ -6,6 +6,7 @@ import django
 django.setup()
 from subprocess import Popen, PIPE
 from connection import Connection
+import codecs
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -15,7 +16,7 @@ connKnihovna = Connection("knihovna")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """
-    file = open('/etc/passwd', 'r')
+    file = codecs.open('/etc/passwd', 'r', 'utf-8')
     passwd = file.read()
     return user in passwd
 
@@ -138,7 +139,7 @@ def knihovna_update_user(kod_baka, rfid):
     connKnihovna.execute(query, protected=False)
 
 def get_unix_users():
-    file = open("/etc/passwd", "r")
+    file = codecs.open("/etc/passwd", "r", 'utf-8')
     content = file.readlines()
 
     user_list = []
