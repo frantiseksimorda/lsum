@@ -50,6 +50,7 @@ class Student(models.Model):
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
+    date_of_birth = models.DateTimeField(null=True, default=datetime.now)
     kod_baka = models.CharField(max_length=20)
     school_class = models.ForeignKey(School_class)
     rfid = models.CharField(max_length=20, null=True)

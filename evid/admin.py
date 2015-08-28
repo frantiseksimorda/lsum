@@ -10,7 +10,7 @@ class Student_resource(resources.ModelResource):
         fields = ('kod_baka', 'name', 'surname', 'school_class')
 
 class Student_admin(ImportExportActionModelAdmin):
-    list_display = ("id", "surname", "name", "school_class", "rfid", "status")
+    list_display = ("id", "surname", "name", "school_class", "rfid", "status", "date_of_birth")
     list_display_links = ("surname", )
     search_fields = ("surname", )
     resource_class = Student_resource

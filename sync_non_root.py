@@ -19,6 +19,17 @@ from add_unix_user import *
 sync_interval = 200
 connBaka = Connection("bakalari")
 
+def convert_date(x):
+    x = x.split(".")
+
+    x[0] = x[0].strip()
+    x[1] = x[1].strip()
+    x[2] = x[2].strip()
+
+    if len(x[0]) < 2: x[0]="0"+x[0]
+    if len(x[1]) < 2: x[1]="0"+x[1]
+
+    return x[2]+"-"+x[1]+"-"+x[0]
 
 
 def get_class_id(class_name):
@@ -27,7 +38,7 @@ def get_class_id(class_name):
 def fetch_data():
 
     priznaky = connBaka.execute("SELECT intern_kod, druh, datum FROM histzaku ORDER BY datum DESC ")
-    studenti = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, pohlavi, trida FROM zaci ORDER BY intern_kod")
+    studenti = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, pohlavi, trida, datum_nar FROM zaci ORDER BY intern_kod")
     school_classes = connBaka.execute("SELECT trida FROM zaci GROUP BY trida")
 
     school_classes_parsed = stringList(school_classes)
@@ -43,12 +54,15 @@ def fetch_data():
 
     for i in range(0,len(studenti),1):
 
+        date = convert_date(studenti[i][5])
+
+
         if studenti[i][0] not in stringList(priznaky_parsed):
-            studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], ""))
+            studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], "", date))
         else:
             for j in priznaky_parsed:
                 if j[0] == studenti[i][0]:
-                    studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], j[1]))
+                    studenti_parsed.append((studenti[i][0], studenti[i][1], studenti[i][2], studenti[i][3], studenti[i][4], j[1], date))
 
     return (studenti_parsed, school_classes_parsed)
 
@@ -258,6 +272,7 @@ def sync_lsum_db():
             name=i[1],
             surname=i[2],
             sex=i[3],
+            date_of_birth=i[6],
             kod_baka=i[0],
             school_class_id=get_class_id(i[4]),
             status=i[5],
@@ -271,6 +286,7 @@ def sync_lsum_db():
             name=i[1],
             surname=i[2],
             sex=i[3],
+            date_of_birth=i[6],
             kod_baka=i[0],
             school_class_id=get_class_id(i[4]),
             status=i[5],
@@ -329,12 +345,12 @@ def sync_lsum_db():
 
 def run():
     sync_lsum_db()
-    create_user_accounts()
-    update_user_accounts()
-    disable_enable_emails()
-    schedule_deletion_of_graduated()
-    delete_graduated()
-    write_email_changes()
+    #create_user_accounts()
+    #update_user_accounts()
+    #disable_enable_emails()
+    #schedule_deletion_of_graduated()
+    #delete_graduated()
+    #write_email_changes()
 
 
 while True:
