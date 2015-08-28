@@ -7,7 +7,7 @@ from .models import Student, Teacher
 STUDENTS = tuple((item.id, item.surname+" "+item.name+" ("+str(item.school_class)+"), "+item.kod_baka)
                  for item in Student.objects.all().order_by("surname"))
 
-TEACHERS = tuple((item.id, item.surname+" "+item.name+" (učitel), "+item.kod_baka)
+TEACHERS = tuple((item.id, item.surname+" "+item.name+u" (učitel), "+item.kod_baka)
                  for item in Teacher.objects.all().order_by("surname"))
 
 POSITIONS = tuple((i, str(i)) for i in range(1, 41, 1))
@@ -42,7 +42,7 @@ class RfidAssignToAnotherTeacherForm(forms.Form): #TODO implement
 
     def __init__(self, *args, **kwargs):
         super(RfidAssignToAnotherTeacherForm, self).__init__(*args, **kwargs)
-        self.fields['Select'] = forms.CharField(widget=forms.Select(choices=tuple((item.id, item.surname+" "+item.name+" (učitel), "+item.kod_baka)
+        self.fields['Select'] = forms.CharField(widget=forms.Select(choices=tuple((item.id, item.surname+" "+item.name+u" (učitel), "+item.kod_baka)
                  for item in Teacher.objects.all().order_by("surname"))),
                              label="",
                              required=False,
