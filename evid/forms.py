@@ -38,7 +38,7 @@ class RfidAssignToAnotherOwnerForm(forms.Form):
                              required=False,
                              )
 
-class RfidAssignToAnotherTeacherForm(forms.Form): #TODO implement
+class RfidAssignToAnotherTeacherForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(RfidAssignToAnotherTeacherForm, self).__init__(*args, **kwargs)

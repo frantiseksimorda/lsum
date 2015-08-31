@@ -10,7 +10,7 @@ django.setup()
 from evid.models import Student, School_class, User_account_student, Email_changes, Teacher
 from misc import stringList
 from time import time, asctime
-from login_generator import generate_login, generate_password, generate_email
+from login_generator import generate_login, generate_password, generate_email, generate_teacher_login
 from datetime import timedelta
 from django.utils import timezone
 from add_unix_user import *
@@ -18,6 +18,7 @@ from add_unix_user import *
 
 sync_interval = 200
 connBaka = Connection("bakalari")
+connKopirky = Connection("kopirky")
 
 def convert_date(x):
     x = x.split(".")
@@ -95,6 +96,28 @@ def create_user_accounts():
                     default_passwd=generate_password()
                 )
 
+    for i in Teacher.objects.all():
+
+        if i.kod_baka not in stringList(User_account_student.objects.values_list("kod_baka")):
+            username = generate_teacher_login(i.surname)
+            password = generate_password()
+            email = generate_email(username)
+
+            user_account = User_account_student(
+                kod_baka=i.kod_baka,
+                login=username,
+                default_passwd=password,
+                email=email,
+                email_to_create=True,
+            )
+            user_account.save()
+
+        else:
+            if User_account_student.objects.filter(kod_baka=i.kod_baka).values_list("default_passwd")[0][0] == "":
+                User_account_student.objects.filter(kod_baka=i.kod_baka).update(
+                    default_passwd=generate_password()
+                )
+
     data = list(Student.objects.raw("""
         SELECT evid_student.id,
         evid_student.name,
@@ -110,7 +133,10 @@ def create_user_accounts():
 
     for i in data:
         if not safeq_is_generated(i.login):
-            safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+            if i.login[0] == "x":
+                safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+            else:
+                safeq_create_user(i.login, 1, i.name, i.surname, i.email, i.default_passwd, i.rfid)
 
 def update_user_accounts():
     data = list(Student.objects.raw("""
@@ -142,6 +168,8 @@ def schedule_deletion_of_graduated():
 
     for i in data:
         if i.kod_baka not in stringList(Student.objects.values_list("kod_baka")) and i.delete_time is None:
+            if i.login[0] != "x":
+                continue
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(delete_time=timezone.now() + timedelta(days=365))
             User_account_student.objects.filter(kod_baka=i.kod_baka).update(email_to_disable=True)
 
@@ -331,6 +359,21 @@ def sync_lsum_db():
             active=not(i[3]),
             rfid="",
         )
+
+def safeq_delete_teachers():
+    data = list(Student.objects.raw("""
+        SELECT evid_teacher.id,
+        evid_teacher.rfid,
+        evid_user_account_student.login
+        FROM evid_teacher
+        INNER JOIN evid_user_account_student
+        ON evid_teacher.kod_baka = evid_user_account_student.kod_baka
+        WHERE evid_teacher.active = 0
+    """))
+
+    for i in data:
+        if not i.active:
+            connKopirky.execute("DELETE FROM users WHERE login "+i.login)
 
 
 

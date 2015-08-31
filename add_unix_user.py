@@ -11,8 +11,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-#connKopirky = Connection("kopirky")
-#connKnihovna = Connection("knihovna")
+connKopirky = Connection("kopirky")
+connKnihovna = Connection("knihovna")
 
 def is_generated(user):
     """ Parse /etc/passwd file to findout if user exists """

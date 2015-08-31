@@ -20,7 +20,7 @@
         {% if scanned %}
                 Číslo čipu: <b>{{ chip }}</b>
             {% if owner %}
-                <p>Majitel čipu: <span style="color: #008800"><b>{{ owner.name }}{{ owner.surname }}({{ owner.school_class }}), {{ owner.kod_baka }}</b></span></p>
+                <p>Majitel čipu: <span style="color: #008800"><b>{{ owner.name }}{{ owner.surname }}({% if owner.school_class %}{{ owner.school_class }}{% else %}učitel{% endif%}), {{ owner.kod_baka }}</b></span></p>
             {% else %}
                 <p>Majitel čipu: <span style="color: #FF0000"><b>Nikdo</b></span></p>
             {% endif %}
@@ -43,11 +43,27 @@
                     {{ form3 }}
                     <input name="submit3" type="submit" value="Přiřadit jinému majiteli" />
                 </form>
+
+                <br>
+
+                <form action="/admin/match_rfids_one/" method="post">
+                    {% csrf_token %}
+                    {{ form4 }}
+                    <input name="submit4" type="submit" value="Přiřadit jinému učiteli" />
+                </form>
             {% else %}
                 <form action="/admin/match_rfids_one/" method="post">
                     {% csrf_token %}
                     {{ form3 }}
                     <input name="submit3" type="submit" value="Přiřadit novému majiteli" />
+                </form>
+
+                <br>
+
+                <form action="/admin/match_rfids_one/" method="post">
+                    {% csrf_token %}
+                    {{ form4 }}
+                    <input name="submit4" type="submit" value="Přiřadit novému učiteli" />
                 </form>
             {% endif %}
 

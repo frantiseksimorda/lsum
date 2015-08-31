@@ -60,6 +60,22 @@ def generate_password():
 def generate_email(login):
     return login + "@gjk.cz"
 
+def generate_teacher_login(surname):
+
+    existing_logins = stringList(User_account_student.objects.values_list("login"))
+
+    username = shorten(surname, len(surname))
+
+    counter = 0
+    for existing_login in existing_logins:
+        if username in existing_login:
+            counter += 1
+
+    if counter > 0:
+        username += str(counter)
+
+    return username
+
 
 
 

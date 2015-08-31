@@ -7,6 +7,9 @@
     <form action="match_rfids/">
         <input type="submit" value="Správa čipů">
     </form>
+    <form action="{% url 'create_csv' %}">
+        <input type="submit" value="Exportovat CSV">
+    </form>
 
     {% if any_changes %}
         <span style="color: #ff0000">

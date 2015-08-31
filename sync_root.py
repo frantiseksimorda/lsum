@@ -28,10 +28,14 @@ def create_user_accounts():
 
     for i in data:
         if not is_generated(i.login):
-            create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
-            x = Lsum_account(login=i.login)
-            x.save()
-
+            if i.login[0] == "x":
+                create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
+                x = Lsum_account(login=i.login)
+                x.save()
+            else:
+                create_unix_user(i.login, 1, i.name, i.surname, i.default_passwd)
+                x = Lsum_account(login=i.login)
+                x.save()
 
 def update_user_accounts():
     pass

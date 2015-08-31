@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from .models import Email_changes, User_account_student, Error_log, Student
-from django.shortcuts import render, HttpResponseRedirect
+from .models import Email_changes, User_account_student, Error_log, Student, School_class
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from .forms import *
 from misc import stringList, activeBrowser, UnicodeWriter
 from django import forms
 import subprocess
+import csv
+
+def get_class_name(idx):
+    return School_class.objects.values_list("short_name").filter(id=idx)[0][0]
 
 def print_papers_students(request):
 
@@ -108,7 +112,7 @@ def match_rfids_all(request):
     if form.is_valid():
         chip = form.cleaned_data["Chip"]
 
-        if chip not in stringList(Student.objects.values_list("rfid")):
+        if chip not in stringList(Student.objects.values_list("rfid")) and chip not in stringList(Teacher.objects.values_list("rfid")):
             Student.objects.filter(kod_baka=active_student.kod_baka).update(rfid=chip)
             message = "Čip úspěšně uložen: "+active_student.name+" "+active_student.surname+" ("+str(active_student.school_class)+")."
             count_unmatched = len(Student.objects.filter(rfid=""))
@@ -127,7 +131,11 @@ def match_rfids_all(request):
 
             message_color = "#008800"
         else:
-            x = Student.objects.filter(rfid=chip)[0]
+            try:
+                x = Student.objects.filter(rfid=chip)[0]
+            except:
+                x = Teacher.objects.filter(rfid=chip)[0]
+                x.school_class = "ucitel"
             message = "Čip je již zaevidován: "+x.name+" "+x.surname+" ("+str(x.school_class)+"), "+x.kod_baka+". Vyberte jiný."
             message_color = "#FF0000"
 
@@ -155,9 +163,11 @@ def match_rfids_one(request):
     form1 = RfidScanForm()
     form2 = RfidScanForm(request.POST)
     form3 = RfidAssignToAnotherOwnerForm(request.POST)
+    form4 = RfidAssignToAnotherTeacherForm(request.POST)
 
     form2.fields['Chip'].widget = forms.HiddenInput()
     form3.fields['Chip'].widget = forms.HiddenInput()
+    form4.fields['Chip'].widget = forms.HiddenInput()
 
     if request.method == "POST":
 
@@ -169,7 +179,11 @@ def match_rfids_one(request):
                 if len(owner) > 0:
                     owner = owner[0]
                 else:
-                    owner = False
+                    owner = Teacher.objects.filter(rfid=chip)
+                    if len(owner) > 0:
+                        owner = owner[0]
+                    else:
+                        owner = False
 
                 form1 = RfidScanForm()
                 scanned = True
@@ -181,6 +195,7 @@ def match_rfids_one(request):
             if form2.is_valid():
                 chip = form2.cleaned_data["Chip"]
                 Student.objects.filter(rfid=chip).update(rfid="")
+                Teacher.objects.filter(rfid=chip).update(rfid="")
                 owner = False
                 scanned = True
 
@@ -192,8 +207,25 @@ def match_rfids_one(request):
                 chip = form3.cleaned_data["Chip"]
                 student_id = form3.cleaned_data["Select"]
                 Student.objects.filter(rfid=chip).update(rfid="")
+                Teacher.objects.filter(rfid=chip).update(rfid="")
                 Student.objects.filter(id=student_id).update(rfid=chip)
                 owner = Student.objects.filter(rfid=chip)[0]
+                scanned = True
+            else:
+                owner = False
+                scanned = False
+
+        elif "submit4" in request.POST:
+            form4 = RfidAssignToAnotherTeacherForm(request.POST)
+            form4.fields['Chip'].widget = forms.HiddenInput()
+
+            if form4.is_valid():
+                chip = form4.cleaned_data["Chip"]
+                student_id = form4.cleaned_data["Select"]
+                Student.objects.filter(rfid=chip).update(rfid="")
+                Teacher.objects.filter(rfid=chip).update(rfid="")
+                Teacher.objects.filter(id=student_id).update(rfid=chip)
+                owner = Teacher.objects.filter(rfid=chip)[0]
                 scanned = True
             else:
                 owner = False
@@ -212,6 +244,7 @@ def match_rfids_one(request):
                   {'form1': form1,
                    'form2': form2,
                    'form3': form3,
+                   'form4': form4,
                    'owner': owner,
                    'scanned': scanned,
                    'chip': chip})
@@ -261,10 +294,14 @@ def match_rfids_student(request):
                 chip = form3.cleaned_data["Chip"]
                 student_id = form3.cleaned_data["Student_id"]
 
-                if chip not in stringList(Student.objects.values_list("rfid")):
+                if chip not in stringList(Student.objects.values_list("rfid")) and chip not in stringList(Teacher.objects.values_list("rfid")):
                     Student.objects.filter(id=student_id).update(rfid=chip)
                 else:
-                    x = Student.objects.filter(rfid=chip)[0]
+                    try:
+                        x = Student.objects.filter(rfid=chip)[0]
+                    except:
+                        x = Teacher.objects.filter(rfid=chip)[0]
+                        x.school_class = "ucitel"
                     message = "Čip je již zaevidován: "+x.name+" "+x.surname+" ("+str(x.school_class)+"), "+x.kod_baka+". Vyberte jiný."
                     form3 = RfidAssignSingleScanForm()
                     form3.fields["Student_id"].initial = student_id
@@ -296,8 +333,10 @@ def sync_emails(request):
         email = unicode(i.email)
         password = unicode(i.default_passwd)
 
-        if i.action == "create":
+        if i.action == "create" and email[0] == "x":
             command = "python2 GAM/gam.py create user \""+email+"\" firstname \""+name+"\" lastname \""+surname+"\" password \""+password+"\" changepassword 1 org studenti"
+        elif i.action == "create" and email[0] != "x":
+            command = "python2 GAM/gam.py create user \""+email+"\" firstname \""+name+"\" lastname \""+surname+"\" password \""+password+"\" changepassword 1 org Kantori"
         elif i.action == "delete":
             command = "python2 GAM/gam.py delete user \""+email+"\""
         elif i.action == "disable":
@@ -338,4 +377,31 @@ def skip_student(request):
         Student.objects.filter(rfid="").update(to_be_skipped=False)
 
     return HttpResponseRedirect("/admin/match_rfids_all/")
+
+def create_csv(request):
+    data = list(Student.objects.raw("""
+            SELECT evid_student.id,
+            evid_student.name,
+            evid_student.surname,
+            evid_student.school_class_id,
+            evid_student.date_of_birth,
+            evid_student.rfid,
+            evid_user_account_student.login,
+            evid_user_account_student.email
+            FROM evid_student
+            INNER JOIN evid_user_account_student
+            ON evid_student.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="temp.csv"'
+
+    spamwriter = UnicodeWriter(response, delimiter=str(","),
+                            quotechar=str('|'), quoting=csv.QUOTE_MINIMAL)
+    spamwriter.writerow(["jmeno","prijmeni","trida","datum narozeni","cip","login","email"])
+    for i in data:
+        spamwriter.writerow([i.name.strip(), i.surname.strip(), unicode(get_class_name(i.school_class_id)), unicode(i.date_of_birth)[:10], i.rfid, i.login, i.email])
+
+
+    return response
 
