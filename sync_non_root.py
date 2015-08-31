@@ -69,7 +69,7 @@ def fetch_data():
     return (studenti_parsed, school_classes_parsed)
 
 def fetch_data_teachers():
-    ucitele = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, deleted_rc FROM ucitele ORDER BY intern_kod")
+    ucitele = connBaka.execute("SELECT intern_kod, jmeno, prijmeni, deleted_rc FROM ucitele ORDER BY intern_kod WHERE deleted_rc = 0")
     return ucitele
 
 def create_user_accounts():
