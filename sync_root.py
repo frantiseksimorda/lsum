@@ -36,6 +36,7 @@ def create_user_accounts():
         SELECT evid_teacher.id,
         evid_teacher.name,
         evid_teacher.surname,
+        evid_teacher.active,
         evid_user_account_student.login,
         evid_user_account_student.default_passwd
         FROM evid_teacher
@@ -44,7 +45,7 @@ def create_user_accounts():
     """))
 
     for i in data:
-        if not is_generated(i.login):
+        if not is_generated(i.login) and i.active == 1:
             create_unix_user(i.login, 1, i.name, i.surname, i.default_passwd)
             x = Lsum_account(login=i.login)
             x.save()
