@@ -55,8 +55,10 @@ def fetch_data():
     studenti_parsed = []
 
     for i in range(0,len(studenti),1):
-
-        date = convert_date(studenti[i][5])
+        try:
+            date = convert_date(studenti[i][5])
+        except:
+            date = timezone.now()
 
 
         if studenti[i][0] not in stringList(priznaky_parsed):
