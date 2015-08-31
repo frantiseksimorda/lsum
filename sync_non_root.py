@@ -133,10 +133,25 @@ def create_user_accounts():
 
     for i in data:
         if not safeq_is_generated(i.login):
-            if i.login[0] == "x":
-                safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
-            else:
-                safeq_create_user(i.login, 1, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+            safeq_create_user(i.login, 0, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+
+    data = list(Teacher.objects.raw("""
+        SELECT evid_teacher.id,
+        evid_teacher.name,
+        evid_teacher.surname,
+        evid_teacher.rfid,
+        evid_user_account_student.login,
+        evid_user_account_student.default_passwd,
+        evid_user_account_student.email
+        FROM evid_teacher
+        INNER JOIN evid_user_account_student
+        ON evid_teacher.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    for i in data:
+        if not safeq_is_generated(i.login):
+            safeq_create_user(i.login, 1, i.name, i.surname, i.email, i.default_passwd, i.rfid)
+
 
 def update_user_accounts():
     data = list(Student.objects.raw("""
@@ -146,6 +161,20 @@ def update_user_accounts():
         FROM evid_student
         INNER JOIN evid_user_account_student
         ON evid_student.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    for i in data:
+        if i.rfid != "":
+            safeq_update_user(i.login, i.rfid)
+            knihovna_update_user(i.kod_baka, i.rfid)
+
+    data = list(Teacher.objects.raw("""
+        SELECT evid_teacher.id,
+        evid_teacher.rfid,
+        evid_user_account_student.login
+        FROM evid_teacher
+        INNER JOIN evid_user_account_student
+        ON evid_teacher.kod_baka = evid_user_account_student.kod_baka
     """))
 
     for i in data:
