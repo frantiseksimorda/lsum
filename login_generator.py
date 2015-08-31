@@ -64,7 +64,7 @@ def generate_teacher_login(surname):
 
     existing_logins = stringList(User_account_student.objects.values_list("login"))
 
-    username = shorten(surname, len(surname))
+    username = shorten(surname, len(surname.strip()))
 
     counter = 0
     for existing_login in existing_logins:
