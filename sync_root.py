@@ -28,14 +28,26 @@ def create_user_accounts():
 
     for i in data:
         if not is_generated(i.login):
-            if i.login[0] == "x":
-                create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
-                x = Lsum_account(login=i.login)
-                x.save()
-            else:
-                create_unix_user(i.login, 1, i.name, i.surname, i.default_passwd)
-                x = Lsum_account(login=i.login)
-                x.save()
+            create_unix_user(i.login, 0, i.name, i.surname, i.default_passwd)
+            x = Lsum_account(login=i.login)
+            x.save()
+
+    data = list(Student.objects.raw("""
+        SELECT evid_teacher.id,
+        evid_teacher.name,
+        evid_teacher.surname,
+        evid_user_account_student.login,
+        evid_user_account_student.default_passwd
+        FROM evid_teacher
+        INNER JOIN evid_user_account_student
+        ON evid_teacher.kod_baka = evid_user_account_student.kod_baka
+    """))
+
+    for i in data:
+        if not is_generated(i.login):
+            create_unix_user(i.login, 1, i.name, i.surname, i.default_passwd)
+            x = Lsum_account(login=i.login)
+            x.save()
 
 def update_user_accounts():
     pass

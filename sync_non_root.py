@@ -225,7 +225,10 @@ def write_email_changes():
         if i.email_to_create and not i.email_created:
             cond = i.email in stringList(Email_changes.objects.values_list("email")) and "create" in stringList(Email_changes.objects.values_list("action").filter(email=i.email))
             if not cond:
-                data = Student.objects.values_list("name", "surname").filter(kod_baka=i.kod_baka)
+                if i.login[0] == "x":
+                    data = Student.objects.values_list("name", "surname").filter(kod_baka=i.kod_baka)
+                else:
+                    data = Teacher.objects.values_list("name", "surname").filter(kod_baka=i.kod_baka)
 
                 e = Email_changes(user_type=0,
                                   name=data[0][0],
