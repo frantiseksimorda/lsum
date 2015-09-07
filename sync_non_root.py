@@ -166,7 +166,7 @@ def update_user_accounts():
     """))
 
     for i in data:
-        if i.rfid != "":
+        if i.rfid != "" and i.rfid is not None:
             safeq_update_user(i.login, i.rfid)
             knihovna_update_user(i.kod_baka, i.rfid)
 
@@ -180,7 +180,7 @@ def update_user_accounts():
     """))
 
     for i in data:
-        if i.rfid != "":
+        if i.rfid != "" and i.rfid is not None:
             safeq_update_user(i.login, i.rfid)
             knihovna_update_user(i.kod_baka, i.rfid)
 
