@@ -386,6 +386,7 @@ def create_csv(request):
             evid_student.school_class_id,
             evid_student.date_of_birth,
             evid_student.rfid,
+            evid_student.status,
             evid_user_account_student.default_passwd,
             evid_user_account_student.login,
             evid_user_account_student.email
@@ -399,7 +400,7 @@ def create_csv(request):
 
     spamwriter = UnicodeWriter(response, delimiter=str(","),
                             quotechar=str('|'), quoting=csv.QUOTE_MINIMAL)
-    spamwriter.writerow(["jmeno","prijmeni","trida","datum narozeni","cip","login","email","heslo"])
+    spamwriter.writerow(["jmeno","prijmeni","trida","datum narozeni","cip","status","login","email","heslo"])
     for i in data:
         spamwriter.writerow([i.name.strip(), i.surname.strip(),  unicode(get_class_name(i.school_class_id)), unicode(i.date_of_birth)[:10], i.rfid, i.login, i.email, i.default_passwd])
 
