@@ -402,7 +402,7 @@ def create_csv(request):
                             quotechar=str('|'), quoting=csv.QUOTE_MINIMAL)
     spamwriter.writerow(["jmeno","prijmeni","trida","datum narozeni","cip","status","login","email","heslo"])
     for i in data:
-        spamwriter.writerow([i.name.strip(), i.surname.strip(),  unicode(get_class_name(i.school_class_id)), unicode(i.date_of_birth)[:10], i.rfid, i.login, i.email, i.default_passwd])
+        spamwriter.writerow([i.name.strip(), i.surname.strip(),  unicode(get_class_name(i.school_class_id)), unicode(i.date_of_birth)[:10], i.rfid, i.status, i.login, i.email, i.default_passwd])
 
 
     return response
