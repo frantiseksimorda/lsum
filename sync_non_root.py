@@ -151,7 +151,9 @@ def create_user_accounts():
     """))
 
     for i in data:
+        print(i.surname)
         if not safeq_is_generated(i.login):
+            print(i.surname+" vytvarim")
             safeq_create_user(i.login, 1, i.name, i.surname, i.email, i.default_passwd, i.rfid)
 
 
