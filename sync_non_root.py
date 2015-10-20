@@ -391,7 +391,6 @@ def sync_lsum_db():
             name=i[1],
             surname=i[2],
             active=not(i[3]),
-            rfid="",
         )
 
 def safeq_delete_teachers():
