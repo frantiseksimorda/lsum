@@ -7,6 +7,7 @@
     </head>
 
     <body>
+     {% if user.is_authenticated %}
         {% if message %}
             <span style="color: #FF0000"><b>{{ message }}</b></span>
         {% endif%}
@@ -54,7 +55,10 @@
         <br><br>
 
         <p><a href="/admin/match_rfids/">Zpět</a></p>
-
+	{% else %}
+	<p>Prosím přihlašte se!</p>
+    {% endif %}
+        
 
     </body>
 

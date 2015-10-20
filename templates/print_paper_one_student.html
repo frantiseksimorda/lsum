@@ -30,7 +30,7 @@
     </head>
 
     <body>
-
+    {% if user.is_authenticated %}
         <p>Vyberte studenta:</p>
 
         <form action="/admin/print_paper_one_student/" method="post">
@@ -110,7 +110,10 @@
 
 
 
-
+	{% else %}
+	<p>Prosím přihlašte se!</p>
+    {% endif %}
+            
     </body>
 
 </html>

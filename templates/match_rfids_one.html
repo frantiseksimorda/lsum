@@ -7,7 +7,8 @@
     </head>
 
     <body>
-        <p>Načtěte čip:</p>
+	{% if user.is_authenticated %}
+	<p>Načtěte čip:</p>
 
         <form action="/admin/match_rfids_one/" method="post">
             {% csrf_token %}
@@ -72,6 +73,10 @@
         <br><br>
 
         <p><a href="/admin/match_rfids/">Zpět</a></p>
+    
+        {% else %}
+            <p>Prosím přihlašte se!</p>
+    {% endif %}
 
     </body>
 

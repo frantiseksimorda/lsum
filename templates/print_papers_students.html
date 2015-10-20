@@ -49,7 +49,7 @@
                 }
             </style>
         </head>
-
+ {% if user.is_authenticated %}
         <body onload="window.print()">
             {% block content %}
 
@@ -83,6 +83,11 @@
             <p><a href="/admin/match_rfids">Přejít do správy čipů</a></p>
         </body>
 
+    {% endif %}
+
+
+        {% else %}
+	<p>Prosím přihlašte se!</p>
     {% endif %}
 
 </html>
