@@ -9,12 +9,11 @@ django.setup()
 
 from evid.models import Student, School_class, User_account_student, Email_changes, Teacher
 from misc import stringList
-from time import time, asctime
+from time import time, asctime, sleep
 from login_generator import generate_login, generate_password, generate_email, generate_teacher_login
 from datetime import timedelta
 from django.utils import timezone
 from add_unix_user import *
-from time import sleep
 
 
 sync_interval = 60
