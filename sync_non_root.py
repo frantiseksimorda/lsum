@@ -14,6 +14,7 @@ from login_generator import generate_login, generate_password, generate_email, g
 from datetime import timedelta
 from django.utils import timezone
 from add_unix_user import *
+from time import sleep
 
 
 sync_interval = 60
@@ -436,8 +437,9 @@ while True:
     run()
     print("synchronizace provedena "+str(asctime()))
 
-    while timestamp + sync_interval > time():
-        pass
+    sleep(sync_interval)
+    #while timestamp + sync_interval > time():
+    #   pass
 
 
 
