@@ -16,7 +16,7 @@ from django.utils import timezone
 from add_unix_user import *
 
 
-sync_interval = 60
+sync_interval = 300
 connBaka = Connection("bakalari")
 connKopirky = Connection("kopirky")
 

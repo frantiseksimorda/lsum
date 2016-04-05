@@ -12,7 +12,7 @@ from django.utils import timezone
 from add_unix_user import *
 
 
-sync_interval = 60
+sync_interval = 300
 
 def create_user_accounts():
 
